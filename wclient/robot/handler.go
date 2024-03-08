@@ -30,6 +30,7 @@ func initHandlers() {
 	lmap := map[string]*Handler{}
 
 	list = append(list, aiHandler()...)
+	list = append(list, pluginHandler()...)
 	list = append(list, apiHandler()...)
 	list = append(list, badHandler()...)
 	list = append(list, banHandler()...)
