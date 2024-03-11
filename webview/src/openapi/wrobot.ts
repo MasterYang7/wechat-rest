@@ -182,6 +182,15 @@ export const RobotApi = {
         return httpRequest('/bot/profile/update', options);
     },
     /**
+     * @summary 获取指令列表
+     * @param {*} body 获取指令列表参数
+     * @param {*} [options] Override http request option.
+     */
+    robotHandlers(body = {}, options: RequestInit = {}): Promise<RobotHandler[]> {
+        options = { method: 'POST', body: JSON.stringify(body || {}), ...options };
+        return httpRequest('/bot/handlers', options);
+    },
+    /**
      * @summary 创建全局设置
      * @param {SettingCreateParam} body 创建全局设置参数
      * @param {*} [options] Override http request option.
@@ -245,6 +254,12 @@ export interface ChatroomCreateParam {
     roomid: string;
     // 欢迎消息
     welcome_msg?: string;
+    //  定义默认模型
+    model_default?: string;
+    // 定义模型扮演的身份
+    model_context?: string;
+     // 历史消息数量
+     model_history?: number;
 }
 
 export interface ChatroomDeleteParam {
@@ -285,9 +300,17 @@ export interface ChatroomUpdateParam {
     roomid: string;
     // 欢迎消息
     welcome_msg: string;
+    //  定义默认模型
+    model_default?: string;
+    // 定义模型扮演的身份
+    model_context?: string;
+    // 历史消息数量
+    model_history?: number;
 }
 
 export interface KeywordCreateParam {
+    // 分组
+    group: string;
     // 等级
     level?: number;
     // 短语
@@ -295,10 +318,12 @@ export interface KeywordCreateParam {
     // 群聊 id
     roomid: string;
     // 目标
-    target: string;
+    target?: string;
 }
 
 export interface KeywordDeleteParam {
+    // 分组
+    group?: string;
     // 短语
     phrase?: string;
     // 主键
@@ -308,6 +333,8 @@ export interface KeywordDeleteParam {
 }
 
 export interface KeywordFetchAllParam {
+    // 分组
+    group?: string;
     // 等级
     level?: number;
     // 群聊 id
@@ -317,15 +344,21 @@ export interface KeywordFetchAllParam {
 }
 
 export interface KeywordFetchParam {
+    // 分组
+    group?: string;
     // 短语
     phrase?: string;
     // 主键
     rd: number;
     // 群聊 id
     roomid?: string;
+    // 目标
+    target?: string;
 }
 
 export interface KeywordUpdateParam {
+    // 分组
+    group: string;
     // 等级
     level: number;
     // 短语
@@ -400,8 +433,6 @@ export interface LlmodelUpdateParam {
 }
 
 export interface ProfileCreateParam {
-    // 唤醒词
-    ai_argot?: string;
     // 会话模型
     ai_model?: string;
     // 封禁期限
@@ -426,6 +457,8 @@ export interface ProfileDeleteParam {
 }
 
 export interface ProfileFetchAllParam {
+    // 等级
+    level?: number;
     // 群聊 id
     roomid?: string;
     // 微信 id
@@ -442,8 +475,6 @@ export interface ProfileFetchParam {
 }
 
 export interface ProfileUpdateParam {
-    // 唤醒词
-    ai_argot: string;
     // 会话模型
     ai_model: string;
     // 封禁期限
@@ -458,6 +489,21 @@ export interface ProfileUpdateParam {
     roomid: string;
     // 微信 id
     wxid: string;
+}
+
+export interface RobotHandler {
+    // 0:不限制 7:群管理 9:创始人
+    level: number;
+    // 排序，越小越靠前
+    order: number;
+    // 是否允许在私聊使用
+    chat_able: boolean;
+    // 是否允许在群聊使用
+    room_able: boolean;
+    // 指令
+    command: string;
+    // 指令的描述信息
+    describe: string;
 }
 
 export interface SettingCreateParam {
@@ -539,6 +585,8 @@ export interface TablesChatroom {
 export interface TablesKeyword {
     // 创建时间戳
     created_at: number;
+    // 分组
+    group: string;
     // 优先级等级
     level: number;
     // 短语
@@ -577,8 +625,6 @@ export interface TablesLLModel {
 }
 
 export interface TablesProfile {
-    // 唤醒词
-    ai_argot: string;
     // 会话模型
     ai_model: string;
     // 拉黑截止时间
