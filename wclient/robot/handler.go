@@ -44,7 +44,7 @@ func ResetHandlers() {
 	hlst = append(hlst, apiHandler()...)
 	hlst = append(hlst, badHandler()...)
 	hlst = append(hlst, banHandler()...)
-	list = append(list, pluginHandler()...)
+	hlst = append(hlst, pluginHandler()...)
 	hlst = append(hlst, helpHandler()...)
 	hlst = append(hlst, revokeHandler()...)
 	hlst = append(hlst, roomHandler()...)
@@ -82,12 +82,11 @@ func ResetHandlers() {
 func ApplyHandlers(msg *wcferry.WxMsg) string {
 
 	// 前置钩子
-	for _, v := range Handlers {
-		if v.PreCheck != nil {
-			if txt := v.PreCheck(msg); txt != "" {
-				return txt
-			}
+	for _, v := range handlerPre {
+		if txt := v.PreCheck(msg); txt != "" {
+			return txt
 		}
+	}
 
 	// 清理空白
 	content := strings.TrimSpace(msg.Content)
