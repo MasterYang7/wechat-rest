@@ -20,7 +20,7 @@ func getKey() int {
 	lock.Lock()
 	defer lock.Unlock()
 
-	if index > len(APP_KEY) {
+	if index >= len(APP_KEY) {
 		index = 0
 		return index
 	}
