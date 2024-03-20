@@ -1,0 +1,5 @@
+- feat: 判断违规词时先清洗特殊符号
+- feat: 群聊统计增加聊天总数
+- fix: RoomData panic
+- fix: 防止发送空消息
+- fix: 获取用户名panic

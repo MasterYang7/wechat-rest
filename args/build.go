@@ -14,7 +14,7 @@ var Efs *embed.FS
 
 // 版本信息
 
-const Version = "0.10.0"
+const Version = "0.20.3"
 const BuildVersion = "240106"
 
 // 应用描述
