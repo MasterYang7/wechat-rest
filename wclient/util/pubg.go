@@ -20,20 +20,20 @@ func getKey() int {
 	lock.Lock()
 	defer lock.Unlock()
 
-	if index >= len(APP_KEY) {
+	if index >= len(APP_KEY)-1 {
 		index = 0
-		return index
+		return 0
 	}
 	index++
 	return index
 }
 
-const model = `ID：%s  赛季：第%s赛季
-TPP.KD：%.2f  段位：%s  场伤：%.2f
+const model = `ID:%s  赛季:第%s赛季
+TPP.KD:%.2f  段位:%s  场伤:%.2f 场次:%d
 鉴定为：%s
-FPP.KD：%.2f  段位：%s  场伤：%.2f
-鉴定为：%s
-账号状态：%s
+FPP.KD:%.2f  段位:%s  场伤:%.2f 场次:%d
+鉴定为:%s
+账号状态:%s
 `
 
 func (p *PUBG) GetPlayerRank(name, seasonId string) string {
@@ -108,10 +108,10 @@ func (p *PUBG) GetPlayerRank(name, seasonId string) string {
 
 	result := fmt.Sprintf(model, name, seasonId, tppData.Kd,
 		fmt.Sprintf("%s%s", rankLevel(tppData.Tier), calculateLevel2(tppData.SubTier, tppData.CurrentRankPoint)),
-		tppData.DamageDealt,
+		tppData.DamageDealt, tppData.RoundsPlayed,
 		calculatePlayerLevel(tppData.Kd, tppData.CurrentRankPoint, fppData.DamageDealt), fppData.Kd,
 		fmt.Sprintf("%s%s", rankLevel(fppData.Tier), calculateLevel2(fppData.SubTier, fppData.CurrentRankPoint)),
-		fppData.DamageDealt,
+		fppData.DamageDealt, fppData.RoundsPlayed,
 		calculatePlayerLevel(fppData.Kd, fppData.CurrentRankPoint, fppData.DamageDealt),
 		userInfo.BanType,
 	)

@@ -12,10 +12,9 @@ func pluginHandler() []*Handler {
 	cmds := []*Handler{}
 
 	cmds = append(cmds, &Handler{
-		Level:    0,
+		Level:    -1,
 		Order:    11,
-		ChatAble: true,
-		RoomAble: true,
+		Roomid:   "+",
 		Command:  "/pubg",
 		Describe: "查询游戏信息",
 		Callback: func(msg *wcferry.WxMsg) string {
