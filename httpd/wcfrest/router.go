@@ -5,15 +5,15 @@ import (
 
 	"github.com/opentdp/go-helper/httpd"
 
-	"github.com/opentdp/wechat-rest/args"
-	"github.com/opentdp/wechat-rest/httpd/midware"
-	"github.com/opentdp/wechat-rest/wclient"
+	"github.com/opentdp/wrest-chat/args"
+	"github.com/opentdp/wrest-chat/httpd/middle"
+	"github.com/opentdp/wrest-chat/wclient"
 )
 
 func Route() {
 
 	rg := httpd.Group("/wcf")
-	rg.Use(midware.OutputHandle, midware.ApiGuard)
+	rg.Use(middle.OutputHandle, middle.ApiGuard)
 
 	ctrl := &Controller{wclient.Register()}
 
@@ -62,8 +62,8 @@ func Route() {
 
 	// 启用 HTTP 消息推送
 
-	if args.Web.Webhook != "" {
-		for _, url := range strings.Split(args.Web.Webhook, "\n") {
+	if args.Web.PushUrl != "" {
+		for _, url := range strings.Split(args.Web.PushUrl, "\n") {
 			ctrl.EnrollReceiver(true, urlReciever(url))
 		}
 	}

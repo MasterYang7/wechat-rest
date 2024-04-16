@@ -2,10 +2,10 @@
     "swagger": "2.0",
     "info": {
         "description": "基于 WeChatFerry RPC 实现的微信接口，使用 Go 语言编写，无第三方运行时依赖，易于对接任意编程语言。",
-        "title": "WeChat Rest Api",
+        "title": "Wrest Chat Api",
         "contact": {
             "name": "WeChatRest",
-            "url": "https://github.com/opentdp/wechat-rest"
+            "url": "https://github.com/opentdp/wrest-chat"
         },
         "license": {
             "name": "Apache 2.0",
@@ -15,77 +15,23 @@
     },
     "basePath": "/",
     "paths": {
-        "/api/cronjob/create": {
+        "/api/aichat/config": {
             "post": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "JOB::计划任务"
+                    "API::智能聊天"
                 ],
-                "summary": "添加计划任务",
+                "summary": "获取模型配置",
                 "parameters": [
                     {
-                        "description": "添加计划任务参数",
+                        "description": "智能聊天参数",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cronjob.CreateParam"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/cronjob/delete": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "JOB::计划任务"
-                ],
-                "summary": "删除计划任务",
-                "parameters": [
-                    {
-                        "description": "删除计划任务参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/cronjob.DeleteParam"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/cronjob/detail": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "JOB::计划任务"
-                ],
-                "summary": "获取计划任务",
-                "parameters": [
-                    {
-                        "description": "获取计划任务参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/cronjob.FetchParam"
+                            "$ref": "#/definitions/sundry.AiChatParam"
                         }
                     }
                 ],
@@ -93,29 +39,100 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/tables.Cronjob"
+                            "$ref": "#/definitions/aichat.UserConfig"
                         }
                     }
                 }
             }
         },
-        "/api/cronjob/list": {
+        "/api/aichat/text": {
             "post": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "JOB::计划任务"
+                    "API::智能聊天"
                 ],
-                "summary": "计划任务列表",
+                "summary": "发起文本聊天",
                 "parameters": [
                     {
-                        "description": "获取计划任务列表参数",
+                        "description": "智能聊天参数",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/cronjob.FetchAllParam"
+                            "$ref": "#/definitions/sundry.AiChatParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/plugin/cronjobs": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API::插件管理"
+                ],
+                "summary": "计划任务插件列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/plugin.CronjobPlugin"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/plugin/keywords": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API::插件管理"
+                ],
+                "summary": "外部指令插件列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/plugin.KeywordPlugin"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/system/handlers": {
+            "post": {
+                "tags": [
+                    "API::系统"
+                ],
+                "summary": "获取可用指令",
+                "parameters": [
+                    {
+                        "description": "获取所有可用指令参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sundry.HandlersParam"
                         }
                     }
                 ],
@@ -125,52 +142,28 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tables.Cronjob"
+                                "$ref": "#/definitions/sundry.Handler"
                             }
                         }
                     }
                 }
             }
         },
-        "/api/cronjob/status": {
+        "/api/system/version": {
             "post": {
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "JOB::计划任务"
+                    "API::系统"
                 ],
-                "summary": "计划任务状态",
+                "summary": "获取系统版本",
                 "responses": {
                     "200": {
-                        "description": "OK"
-                    }
-                }
-            }
-        },
-        "/api/cronjob/update": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "JOB::计划任务"
-                ],
-                "summary": "修改计划任务",
-                "parameters": [
-                    {
-                        "description": "修改计划任务参数",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cronjob.UpdateParam"
+                            "$ref": "#/definitions/sundry.SystemVersion"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     }
                 }
             }
@@ -319,21 +312,178 @@
                 }
             }
         },
-        "/bot/handlers": {
+        "/bot/cronjob/create": {
             "post": {
-                "tags": [
-                    "BOT::杂项"
+                "produces": [
+                    "application/json"
                 ],
-                "summary": "机器人指令集",
+                "tags": [
+                    "BOT::计划任务"
+                ],
+                "summary": "添加计划任务",
+                "parameters": [
+                    {
+                        "description": "添加计划任务参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cronjob.CreateParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/bot/cronjob/delete": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::计划任务"
+                ],
+                "summary": "删除计划任务",
+                "parameters": [
+                    {
+                        "description": "删除计划任务参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cronjob.DeleteParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/bot/cronjob/detail": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::计划任务"
+                ],
+                "summary": "获取计划任务",
+                "parameters": [
+                    {
+                        "description": "获取计划任务参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cronjob.FetchParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/tables.Cronjob"
+                        }
+                    }
+                }
+            }
+        },
+        "/bot/cronjob/execute": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::计划任务"
+                ],
+                "summary": "触发计划任务",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/bot/cronjob/list": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::计划任务"
+                ],
+                "summary": "计划任务列表",
+                "parameters": [
+                    {
+                        "description": "获取计划任务列表参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cronjob.FetchAllParam"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/wrobot.RobotHandler"
+                                "$ref": "#/definitions/tables.Cronjob"
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/bot/cronjob/status": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::计划任务"
+                ],
+                "summary": "计划任务状态",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/bot/cronjob/update": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::计划任务"
+                ],
+                "summary": "修改计划任务",
+                "parameters": [
+                    {
+                        "description": "修改计划任务参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cronjob.UpdateParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     }
                 }
             }
@@ -904,6 +1054,153 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/setting.UpdateParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/bot/webhook/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::webhook"
+                ],
+                "summary": "添加webhook",
+                "parameters": [
+                    {
+                        "description": "添加webhook参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/webhook.CreateWebhookParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/bot/webhook/delete": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::webhook"
+                ],
+                "summary": "删除webhook",
+                "parameters": [
+                    {
+                        "description": "删除webhook",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/webhook.DeleteWebhookParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/bot/webhook/detail": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::webhook"
+                ],
+                "summary": "获取webhook",
+                "parameters": [
+                    {
+                        "description": "获取webhook参数",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/webhook.FetchWebhookParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/tables.Webhook"
+                        }
+                    }
+                }
+            }
+        },
+        "/bot/webhook/list": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::webhook"
+                ],
+                "summary": "webhook列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/tables.Webhook"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bot/webhook/{token}/{app}": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BOT::webhook"
+                ],
+                "summary": "接收webhook消息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "webhook token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "webhook类型(例如： github, gitea)",
+                        "name": "app",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "event报文",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
                         }
                     }
                 ],
@@ -1729,7 +2026,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/wcfrest.SendImgRequest"
+                            "$ref": "#/definitions/wcfrest.SendFileRequest"
                         }
                     }
                 ],
@@ -1884,6 +2181,59 @@
         }
     },
     "definitions": {
+        "aichat.MsgHistory": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "消息内容",
+                    "type": "string"
+                },
+                "role": {
+                    "description": "user,assistant",
+                    "type": "string"
+                }
+            }
+        },
+        "aichat.UserConfig": {
+            "type": "object",
+            "properties": {
+                "endpoint": {
+                    "description": "接口地址",
+                    "type": "string"
+                },
+                "family": {
+                    "description": "族类描述",
+                    "type": "string"
+                },
+                "model": {
+                    "description": "模型",
+                    "type": "string"
+                },
+                "msg_history_max": {
+                    "description": "消息记录最大条数",
+                    "type": "integer"
+                },
+                "msg_historys": {
+                    "description": "消息历史记录",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/aichat.MsgHistory"
+                    }
+                },
+                "provider": {
+                    "description": "供应商",
+                    "type": "string"
+                },
+                "role_context": {
+                    "description": "角色设定",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "密钥格式\n科大讯飞 APP-ID,API-KEY,API-SECRET\n文心一言 API-KEY,API-SECRET\n腾讯混元 APP-ID,API-KEY,API-SECRET\n阿里百炼（通义千问） APP-ID,AGENT-KEY,ACCESS_KEY_ID,ACCESS_KEY_SECRET\n其他服务商 API-KEY",
+                    "type": "string"
+                }
+            }
+        },
         "chatroom.CreateParam": {
             "type": "object",
             "required": [
@@ -2172,6 +2522,9 @@
                 "rd": {
                     "type": "integer"
                 },
+                "remark": {
+                    "type": "string"
+                },
                 "roomid": {
                     "type": "string"
                 },
@@ -2250,6 +2603,9 @@
                 },
                 "rd": {
                     "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
                 },
                 "roomid": {
                     "type": "string"
@@ -2366,6 +2722,34 @@
                     "type": "integer"
                 },
                 "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "plugin.CronjobPlugin": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "$ref": "#/definitions/cronjob.CreateParam"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                }
+            }
+        },
+        "plugin.KeywordPlugin": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "$ref": "#/definitions/keyword.CreateParam"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "file": {
                     "type": "string"
                 }
             }
@@ -2558,6 +2942,72 @@
                 }
             }
         },
+        "sundry.AiChatParam": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "wxid": {
+                    "type": "string"
+                }
+            }
+        },
+        "sundry.Handler": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "description": "指令",
+                    "type": "string"
+                },
+                "describe": {
+                    "description": "指令的描述信息",
+                    "type": "string"
+                },
+                "level": {
+                    "description": "0:不限制 7:群管理 9:创始人",
+                    "type": "integer"
+                },
+                "order": {
+                    "description": "排序，越小越靠前",
+                    "type": "integer"
+                },
+                "roomid": {
+                    "description": "使用场景 [*:所有,-:私聊,+:群聊,其他:群聊]",
+                    "type": "string"
+                }
+            }
+        },
+        "sundry.HandlersParam": {
+            "type": "object",
+            "properties": {
+                "reset": {
+                    "description": "是否重置机器人指令",
+                    "type": "boolean"
+                }
+            }
+        },
+        "sundry.SystemVersion": {
+            "type": "object",
+            "properties": {
+                "build_version": {
+                    "description": "系统编译版本",
+                    "type": "string"
+                },
+                "version": {
+                    "description": "系统版本",
+                    "type": "string"
+                },
+                "wcf_version": {
+                    "description": "wcferry 版本",
+                    "type": "string"
+                },
+                "wechat_version": {
+                    "description": "wechat 版本",
+                    "type": "string"
+                }
+            }
+        },
         "tables.Chatroom": {
             "type": "object",
             "properties": {
@@ -2711,6 +3161,10 @@
                     "description": "主键",
                     "type": "integer"
                 },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
                 "roomid": {
                     "description": "群聊 id",
                     "type": "string"
@@ -2849,6 +3303,35 @@
                 "value": {
                     "description": "值",
                     "type": "string"
+                }
+            }
+        },
+        "tables.Webhook": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "创建时间戳",
+                    "type": "integer"
+                },
+                "rd": {
+                    "description": "主键",
+                    "type": "integer"
+                },
+                "remark": {
+                    "description": "备注",
+                    "type": "string"
+                },
+                "target_id": {
+                    "description": "群聊/私聊ID",
+                    "type": "string"
+                },
+                "token": {
+                    "description": "webhook 标识（GUID）",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "最后更新时间戳",
+                    "type": "integer"
                 }
             }
         },
@@ -3164,21 +3647,12 @@
         "wcfrest.SendFileRequest": {
             "type": "object",
             "properties": {
-                "path": {
-                    "description": "文件路径",
+                "base64": {
+                    "description": "文件 base64 数据",
                     "type": "string"
                 },
-                "receiver": {
-                    "description": "接收人或群的 id",
-                    "type": "string"
-                }
-            }
-        },
-        "wcfrest.SendImgRequest": {
-            "type": "object",
-            "properties": {
                 "path": {
-                    "description": "图片路径",
+                    "description": "文件路径，若提供 base64 则写入此路径",
                     "type": "string"
                 },
                 "receiver": {
@@ -3274,32 +3748,45 @@
                 }
             }
         },
-        "wrobot.RobotHandler": {
+        "webhook.CreateWebhookParam": {
+            "type": "object",
+            "required": [
+                "target_id"
+            ],
+            "properties": {
+                "remark": {
+                    "type": "string"
+                },
+                "target_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "webhook.DeleteWebhookParam": {
             "type": "object",
             "properties": {
-                "chat_able": {
-                    "description": "是否允许在私聊使用",
-                    "type": "boolean"
-                },
-                "command": {
-                    "description": "指令",
-                    "type": "string"
-                },
-                "describe": {
-                    "description": "指令的描述信息",
-                    "type": "string"
-                },
-                "level": {
-                    "description": "0:不限制 7:群管理 9:创始人",
+                "rd": {
                     "type": "integer"
                 },
-                "order": {
-                    "description": "排序，越小越靠前",
+                "target_id": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "webhook.FetchWebhookParam": {
+            "type": "object",
+            "properties": {
+                "rd": {
                     "type": "integer"
                 },
-                "room_able": {
-                    "description": "是否允许在群聊使用",
-                    "type": "boolean"
+                "target_id": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         }

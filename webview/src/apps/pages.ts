@@ -11,6 +11,8 @@ import { CronjobListComponent } from './cronjob/list';
 import { CronjobCreateComponent } from './cronjob/create';
 import { CronjobUpdateComponent } from './cronjob/update';
 
+import { HandlerListComponent } from './handler/list';
+
 import { LLModelCreateComponent } from './llmodel/create';
 import { LLModelListComponent } from './llmodel/list';
 import { LLModelUpdateComponent } from './llmodel/update';
@@ -18,6 +20,9 @@ import { LLModelUpdateComponent } from './llmodel/update';
 import { KeywordListComponent } from './keyword/list';
 import { KeywordCreateComponent } from './keyword/create';
 import { KeywordUpdateComponent } from "./keyword/update";
+
+import { PluginCronjobComponent } from './plugin/cronjob';
+import { PluginKeywordComponent } from './plugin/keyword';
 
 import { ProfileListComponent } from './profile/list';
 import { ProfileCreateComponent } from './profile/create';
@@ -27,12 +32,13 @@ import { SettingListComponent } from './setting/list';
 import { SettingCreateComponent } from './setting/create';
 import { SettingUpdateComponent } from './setting/update';
 
-import { HandlerListComponent } from './handler/list';
-
 import { WcferryChatroomComponent } from './wcferry/chatroom';
 import { WcferryContactComponent } from './wcferry/contact';
 import { WcferryDbqueryComponent } from './wcferry/dbquery';
 import { WcferryReceiverComponent } from './wcferry/receiver';
+
+import { WebhookCreateComponent } from './webhook/create';
+import { WebhookListComponent } from "./webhook/list";
 
 
 export const AppComponents = [
@@ -47,6 +53,8 @@ export const AppComponents = [
     CronjobCreateComponent,
     CronjobUpdateComponent,
 
+    HandlerListComponent,
+
     LLModelCreateComponent,
     LLModelListComponent,
     LLModelUpdateComponent,
@@ -54,6 +62,9 @@ export const AppComponents = [
     KeywordListComponent,
     KeywordCreateComponent,
     KeywordUpdateComponent,
+
+    PluginCronjobComponent,
+    PluginKeywordComponent,
 
     ProfileListComponent,
     ProfileCreateComponent,
@@ -63,12 +74,13 @@ export const AppComponents = [
     SettingCreateComponent,
     SettingUpdateComponent,
 
-    HandlerListComponent,
-
     WcferryChatroomComponent,
     WcferryContactComponent,
     WcferryDbqueryComponent,
     WcferryReceiverComponent,
+
+    WebhookCreateComponent,
+    WebhookListComponent
 ];
 
 //////////////////////////////////////////////////////////////////
@@ -86,6 +98,8 @@ export const AppRoutes: Routes = [
     { path: 'cronjob/create', component: CronjobCreateComponent, canActivate: [LoginGuard] },
     { path: 'cronjob/update/:rd', component: CronjobUpdateComponent, canActivate: [LoginGuard] },
 
+    { path: 'handler/list', component: HandlerListComponent, canActivate: [LoginGuard] },
+
     { path: 'llmodel/create', component: LLModelCreateComponent, canActivate: [LoginGuard] },
     { path: 'llmodel/list', component: LLModelListComponent, canActivate: [LoginGuard] },
     { path: 'llmodel/update/:rd', component: LLModelUpdateComponent, canActivate: [LoginGuard] },
@@ -93,6 +107,9 @@ export const AppRoutes: Routes = [
     { path: 'keyword/list', component: KeywordListComponent, canActivate: [LoginGuard] },
     { path: 'keyword/create', component: KeywordCreateComponent, canActivate: [LoginGuard] },
     { path: 'keyword/update/:rd', component: KeywordUpdateComponent, canActivate: [LoginGuard] },
+
+    { path: 'plugin/cronjob', component: PluginCronjobComponent, canActivate: [LoginGuard] },
+    { path: 'plugin/keyword', component: PluginKeywordComponent, canActivate: [LoginGuard] },
 
     { path: 'profile/list', component: ProfileListComponent, canActivate: [LoginGuard] },
     { path: 'profile/create', component: ProfileCreateComponent, canActivate: [LoginGuard] },
@@ -102,12 +119,13 @@ export const AppRoutes: Routes = [
     { path: 'setting/create', component: SettingCreateComponent, canActivate: [LoginGuard] },
     { path: 'setting/update/:rd', component: SettingUpdateComponent, canActivate: [LoginGuard] },
 
-    { path: 'handler/list', component: HandlerListComponent, canActivate: [LoginGuard] },
-
     { path: 'wcferry/chatroom', component: WcferryChatroomComponent, canActivate: [LoginGuard] },
     { path: 'wcferry/contact', component: WcferryContactComponent, canActivate: [LoginGuard] },
     { path: 'wcferry/dbquery', component: WcferryDbqueryComponent, canActivate: [LoginGuard] },
     { path: 'wcferry/receiver', component: WcferryReceiverComponent, canActivate: [LoginGuard] },
+
+    { path: 'webhook/list', component: WebhookListComponent, canActivate: [LoginGuard] },
+    { path: 'webhook/create', component: WebhookCreateComponent, canActivate: [LoginGuard] },
 
     { path: '', redirectTo: 'welcome', pathMatch: 'full' },
     { path: '**', component: Alert404Component },

@@ -1,10 +1,10 @@
-# WeChat Rest Api
+# Wrest Chat Api
 
-基于 [wcferry-gosdk](https://github.com/opentdp/wechat-rest/tree/master/wcferry) 实现的 HTTP 接口服务，已开放如下功能：
+基于 [wcferry-gosdk](https://github.com/opentdp/wrest-chat/tree/master/wcferry) 实现的 HTTP 接口服务，已开放如下功能：
 
 ## 支持的接口列表
 
-### JOB::计划任务
+### API::计划任务
 
 - 添加计划任务
 - 删除计划任务
@@ -12,6 +12,15 @@
 - 计划任务列表
 - 计划任务状态
 - 修改计划任务
+
+### API::指令集
+
+- 获取所有可用指令
+
+### API::插件管理
+
+- 计划任务插件列表
+- 外部指令插件列表
 
 ### BOT::群聊配置
 

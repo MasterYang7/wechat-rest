@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/opentdp/wechat-rest/dbase/keyword"
-	"github.com/opentdp/wechat-rest/dbase/llmodel"
-	"github.com/opentdp/wechat-rest/dbase/profile"
-	"github.com/opentdp/wechat-rest/dbase/setting"
-	"github.com/opentdp/wechat-rest/wcferry"
-	"github.com/opentdp/wechat-rest/wclient/aichat"
+	"github.com/opentdp/wrest-chat/dbase/keyword"
+	"github.com/opentdp/wrest-chat/dbase/llmodel"
+	"github.com/opentdp/wrest-chat/dbase/profile"
+	"github.com/opentdp/wrest-chat/dbase/setting"
+	"github.com/opentdp/wrest-chat/wcferry"
+	"github.com/opentdp/wrest-chat/wclient/aichat"
 )
 
 func helpHandler() []*Handler {
@@ -17,10 +17,9 @@ func helpHandler() []*Handler {
 	cmds := []*Handler{}
 
 	cmds = append(cmds, &Handler{
-		Level:    0,
+		Level:    -1,
 		Order:    900,
-		ChatAble: true,
-		RoomAble: true,
+		Roomid:   "*",
 		Command:  "/help",
 		Describe: "查看帮助信息",
 		Callback: helpCallback,
@@ -49,20 +48,34 @@ func helpCallback(msg *wcferry.WxMsg) string {
 	// 生成指令菜单
 	helper := []string{}
 	for _, v := range handlers {
+		cmd := v.Command
 		if v.Level > 0 {
 			if up == nil || v.Level > up.Level {
 				continue // 没有权限
 			}
 		}
-		if (msg.IsGroup && v.RoomAble) || (!msg.IsGroup && v.ChatAble) {
-			cmd := v.Command
+		if msg.IsGroup {
+			if v.Roomid != "*" && v.Roomid != "+" && v.Roomid != msg.Roomid {
+				continue // 没有权限
+			}
 			if aliasMap[msg.Roomid] != nil && aliasMap[msg.Roomid][v.Command] != "" {
 				cmd = aliasMap[msg.Roomid][v.Command]
-			} else if aliasMap["-"] != nil && aliasMap["-"][v.Command] != "" {
-				cmd = aliasMap["-"][v.Command]
+			} else if aliasMap["+"] != nil && aliasMap["+"][v.Command] != "" {
+				cmd = aliasMap["+"][v.Command]
+			} else if aliasMap["*"] != nil && aliasMap["*"][v.Command] != "" {
+				cmd = aliasMap["*"][v.Command]
 			}
-			helper = append(helper, fmt.Sprintf("【%s】%s", cmd, v.Describe))
+		} else {
+			if v.Roomid != "*" && v.Roomid != "-" {
+				continue // 没有权限
+			}
+			if aliasMap["-"] != nil && aliasMap["-"][v.Command] != "" {
+				cmd = aliasMap["-"][v.Command]
+			} else if aliasMap["*"] != nil && aliasMap["*"][v.Command] != "" {
+				cmd = aliasMap["*"][v.Command]
+			}
 		}
+		helper = append(helper, fmt.Sprintf("【%s】%s", cmd, v.Describe))
 	}
 
 	// 数组转为字符串
@@ -84,11 +97,11 @@ func helpCallback(msg *wcferry.WxMsg) string {
 	// 对话模型相关配置
 	llmCount, _ := llmodel.Count(&llmodel.CountParam{})
 	if llmCount > 0 {
-		model := aichat.UserModel(msg.Sender, msg.Roomid).Family
-		if len(model) > 1 {
-			text += fmt.Sprintf("对话模型 %s；", model)
+		uc := aichat.UserConfig(msg.Sender, msg.Roomid)
+		if len(uc.Family) > 1 {
+			text += fmt.Sprintf("对话模型 %s；", uc.Family)
 		}
-		text += fmt.Sprintf("上下文长度 %d/%d；", aichat.CountHistory(msg.Sender, msg.Roomid), setting.ModelHistory)
+		text += fmt.Sprintf("上下文长度 %d/%d；", len(uc.MsgHistorys), uc.MsgHistoryMax)
 	}
 
 	return text + "祝你好运！"

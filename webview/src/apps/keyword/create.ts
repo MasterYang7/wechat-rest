@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { KeywordGroups, KeywordLevels } from '../../openapi/const';
-import { RobotApi, KeywordCreateParam, RobotHandler } from '../../openapi/wrobot';
+import { UserLevels, SpecialRooms, KeywordGroups, BadwordLevels } from '../../openapi/const';
+import { SundryApi, Handler } from '../../openapi/sundry';
+import { RobotApi, KeywordCreateParam } from '../../openapi/wrobot';
 import { WrestApi, WcfrestContactPayload } from '../../openapi/wcfrest';
 
 
@@ -12,10 +13,12 @@ import { WrestApi, WcfrestContactPayload } from '../../openapi/wcfrest';
 })
 export class KeywordCreateComponent {
 
+    public userLevels = UserLevels;
+    public specialRooms = SpecialRooms;
     public keywordGroups = KeywordGroups;
-    public keywordLevels = KeywordLevels;
+    public badwordLevels = BadwordLevels;
 
-    public robotHandler: Array<RobotHandler> = [];
+    public robotHandler: Array<Handler> = [];
     public wcfChatrooms: Array<WcfrestContactPayload> = [];
 
     public formdata: KeywordCreateParam = {
@@ -23,7 +26,7 @@ export class KeywordCreateComponent {
         roomid: '-',
         phrase: '',
         target: '',
-        level: 1,
+        level: -1,
     };
 
     constructor(private router: Router) {
@@ -35,19 +38,24 @@ export class KeywordCreateComponent {
         if (this.formdata.level) {
             this.formdata.level = +this.formdata.level;
         }
-        RobotApi.keywordCreate(this.formdata).then(() => {
+        return RobotApi.keywordCreate(this.formdata).then(() => {
             this.router.navigate(['keyword/list']);
         });
     }
 
+    public changeHandler() {
+        const h = this.robotHandler.find((h) => h.command === this.formdata.target);
+        this.formdata.level = h ? h.level : -1;
+    }
+
     public getRobotHandlers() {
-        RobotApi.robotHandlers().then((data) => {
+        return SundryApi.systemHandlers({}).then((data) => {
             this.robotHandler = data || [];
         });
     }
 
     public getWcfChatrooms() {
-        WrestApi.chatrooms().then((data) => {
+        return WrestApi.chatrooms().then((data) => {
             this.wcfChatrooms = data || [];
         });
     }

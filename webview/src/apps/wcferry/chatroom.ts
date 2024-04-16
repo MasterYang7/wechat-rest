@@ -2,56 +2,44 @@ import { Component } from '@angular/core';
 
 import { WrestApi, WcfrestContactPayload } from '../../openapi/wcfrest';
 
+import { WcferryContactComponent } from './contact';
 
 @Component({
     selector: 'page-wcferry-chatroom',
     templateUrl: 'chatroom.html',
     styleUrls: ['chatroom.scss']
 })
-export class WcferryChatroomComponent {
+export class WcferryChatroomComponent extends WcferryContactComponent {
 
-    public avatars: Record<string, string> = {};
     public roomMembers: Record<string, Array<WcfrestContactPayload>> = {};
 
-    public chatrooms: Array<WcfrestContactPayload> = [];
-    public chatroom!: WcfrestContactPayload;
+    public chat = {} as WcfrestContactPayload;
 
-    public members: Array<WcfrestContactPayload> = [];
-    public member!: WcfrestContactPayload;
+    public conactsFilter = '';
 
-    constructor() {
-        this.getChatrooms();
+    public changeChat(item: WcfrestContactPayload) {
+        if (item.wxid.indexOf('@chatroom') > 0) {
+            this.getChatroom(item);
+        }
+        this.chat = item;
     }
 
-    public getChatrooms() {
-        WrestApi.chatrooms().then((data) => {
-            this.chatrooms = data || [];
-            // 批量获取头像
-            const ids = this.chatrooms.map((item) => item.wxid);
-            this.getAvatars(ids);
+    override getContacts() {
+        return super.getContacts().then(() => {
+            const c1 = this.contacts.filter((v) => '群聊'.includes(v.type));
+            const c2 = this.contacts.filter((v) => '好友'.includes(v.type));
+            this.contacts = [...c1, ...c2];
+            this.chat = this.contacts[0];
         });
     }
 
     public getChatroom(room: WcfrestContactPayload) {
-        this.chatroom = room;
         if (this.roomMembers[room.wxid]) {
-            this.members = this.roomMembers[room.wxid];
-            return; // 已获取
+            return Promise.resolve(); //已获取
         }
-        WrestApi.chatroomMembers({ roomid: room.wxid }).then((data) => {
-            this.roomMembers[room.wxid] = data || [];
-            this.members = data || [];
-            // 批量获取头像
-            const ids = this.members.map((item) => item.wxid);
-            this.getAvatars(ids);
-        });
-    }
-
-    public getAvatars(ids: string[]) {
-        WrestApi.avatars({ wxids: [...new Set(ids)] }).then((data) => {
-            data && data.forEach((item) => {
-                this.avatars[item.usr_name] = item.small_head_img_url;
-            });
+        return WrestApi.chatroomMembers({ roomid: room.wxid }).then((data) => {
+            this.roomMembers[room.wxid] = (data = data || []);
+            this.getAvatars(data.map((v) => v.wxid));
         });
     }
 

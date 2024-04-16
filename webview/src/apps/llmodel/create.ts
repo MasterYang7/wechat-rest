@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { UserLevels } from '../../openapi/const';
+import { AiModels, UserLevels } from '../../openapi/const';
 import { RobotApi, LlmodelCreateParam } from '../../openapi/wrobot';
 
 
@@ -11,11 +11,12 @@ import { RobotApi, LlmodelCreateParam } from '../../openapi/wrobot';
 })
 export class LLModelCreateComponent {
 
+    public aiModels = AiModels;
     public userLevels = UserLevels;
 
     public formdata: LlmodelCreateParam = {
         mid: '',
-        level: 1,
+        level: -1,
         family: '',
         provider: 'google',
         model: 'gemini-pro',
@@ -28,7 +29,7 @@ export class LLModelCreateComponent {
         if (this.formdata.level) {
             this.formdata.level = +this.formdata.level;
         }
-        RobotApi.llmodelCreate(this.formdata).then(() => {
+        return RobotApi.llmodelCreate(this.formdata).then(() => {
             this.router.navigate(['llmodel/list']);
         });
     }

@@ -1,6 +1,8 @@
-# WeChat Rest
+# Wrest Chat
 
-微信智能助手，内置 WEB 管理界面，可接入GPT、Gemini、星火、文心、混元、通义千问等大语言模型。本项目**未对微信程序进行任何破解或修改**，与微信互操作的能力均基于开源项目 [WeChatFerry RPC](https://github.com/lich0821/WeChatFerry/tree/master/WeChatFerry) 实现，感谢各位开源贡献者。
+智能聊天助手，是一个通用的聊天辅助程序，通过 [Nanomsg 协议](wcferry/proto/wcferry.proto) 与聊天软件互通，内置 WEB 管理界面，可接入GPT、Gemini、星火、文心、混元、通义千问等大语言模型。目前已适配 *PC微信*，更多聊天软件适配中，敬请期待！
+
+> 本项目**未对微信程序进行任何破解或修改**，与微信互操作的能力均基于开源项目 [WeChatFerry RPC](https://github.com/lich0821/WeChatFerry/tree/master/WeChatFerry) 实现，感谢各位开源贡献者。
 
 ## 主要特性
 
@@ -13,12 +15,13 @@
 - 内置 Web 管理界面，可以管理机器人各项配置
 - 内置 Api 调试工具，所有接口都可以在线调试
 - 尽可能将消息中的 Xml 转为 Object，便于前端解析
+- 支持计划任务、外部指令、指令插件等扩展功能，详见 [wrest-plugin](https://github.com/opentdp/wrest-plugin)
 
 ## 快速开始
 
-请仔细阅读本文档和[常见问题](#常见问题)后再开始使用；首次使用可参照下面的步骤开始：
+请仔细阅读[免责声明](#免责声明)和[常见问题](#常见问题)后再开始使用，首次使用可参照下面的步骤开始：
 
-- 下载并安装 [WeChatSetup-3.9.2.23.exe](https://github.com/opentdp/wechat-rest/releases/download/v0.0.1/WeChatSetup-3.9.2.23.exe) 和 [wechat-rest.zip](https://github.com/opentdp/wechat-rest/releases)
+- 下载并安装 [WeChatSetup-3.9.2.23.exe](https://github.com/opentdp/wrest-chat/releases/download/v0.0.1/WeChatSetup-3.9.2.23.exe) 和 [wrest-chat.zip](https://github.com/opentdp/wrest-chat/releases)
 
   - 非开发者请直接下载编译好的二进制文件，不要下载源码
 
@@ -44,7 +47,9 @@
 
 ## 开发指南
 
-查看和调试 *HTTP/WS* 接口，请使用浏览器访问 `http://localhost:7600/swagger/`
+模块依赖示意：`WEB ---> API ---> BOT ---> SDK ---> Wcferry ---> WeChat`。其中 `BOT` 模块并非必须的，可根据自己的需求选择是否开启，`Wcferry` 模块为第三方开源依赖，必须和 `WeChat` 版本匹配使用。
+
+查看和调试 *HTTP/WS* 接口，可使用浏览器访问 `http://localhost:7600/swagger/`。更多插件开发资源请查阅 [wrest-plugin](https://github.com/opentdp/wrest-plugin) 项目。
 
 ### API 模块
 
@@ -78,24 +83,36 @@
 
 ## 常见问题
 
-### Q1 注入失败
+### Q1、提示注入失败
 
-当前分支兼容的 PC 微信版本是 `3.9.2.23`，请在  [快速开始](#快速开始) 中点击下载
+当前分支兼容的**PC微信**版本是 `3.9.2.23`，请在  [快速开始](#快速开始) 中点击下载。
 
-### Q2 如何在群内 `@` 其他人
+### Q2、如何在群内 `@` 其他人
 
-首先要在消息中添加 `@昵称`，然后在 `aters` 参数添加此人的 `wxid`。相关接口 `/wcf/send_txt`
+首先要在消息中添加 `@昵称`，然后在 `aters` 参数添加此人的 `wxid`。相关接口 `/wcf/send_txt`。
 
-### Q3 如何更新机器人，并保留配置信息
+### Q3、如何更新机器人程序
 
-从 [快速开始](#快速开始) 中下载新版本。关闭机器人后，将解压出来的 `wrest.exe` 和 `wcferry` 覆盖过去即可
+从 [快速开始](#快速开始) 中下载新版本。关闭机器人后，将解压出来的文件覆盖过去。若修改过 `config.yml` 请排除，防止配置被重置。
 
-### Q4 常用 AI 密钥获取地址
+### Q4、常用 AI 密钥获取地址
 
 - 阿里 通义千问 <https://dashscope.console.aliyun.com/apiKey>
 - 讯飞 星火 <https://console.xfyun.cn/services/bm3>
 - 谷歌 Gemini <https://aistudio.google.com/app/apikey?hl=zh-cn>
 
+### Q5、更改系统内置指令参数
+
+登录控制台 `http://localhost:7600/#/keyword/list`，添加一个**指令别名**，修改需要的参数，保存后生效。
+
+- 场景选择`全局`，修改级别为需要的值，可**覆盖内置指令级别**
+- 所有内置指令修改级别为管理员以上的值，相当于在全局**禁用内置指令**
+- 添加一个名为 `@xxx` 的指令别名，目标选择 `/ai`，可实现使用 `@xxx` 唤醒
+
+### Q6、消息不推送或管理页卡住
+
+点击CMD窗口的左上角，选择`属性`，取消`快速编辑模式`，保存后关闭。在窗口中按下任意键（理论上应该无反应），检查下机器人是否恢复正常，否则请重启机器人。
+
 ## 免责声明
 
-[Wechat-Rest](https://github.com/opentdp/wechat-rest) 和 [WeChatFerry](https://github.com/lich0821/WeChatFerry) 均仅供学习交流，不保证代码质量，不得用于商业用途。非法用途导致的后果自行承担。
+[WrestChat](https://github.com/opentdp/wrest-chat) 和 [WeChatFerry](https://github.com/lich0821/WeChatFerry) 是供学习交流的开源项目，代码及其制品仅供参考，不保证质量，不构成任何商业承诺或担保，不得用于商业或非法用途，使用者自行承担后果。

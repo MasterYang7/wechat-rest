@@ -3,18 +3,19 @@ package keyword
 import (
 	"github.com/opentdp/go-helper/dborm"
 
-	"github.com/opentdp/wechat-rest/dbase/tables"
+	"github.com/opentdp/wrest-chat/dbase/tables"
 )
 
 // 创建关键词
 
 type CreateParam struct {
 	Rd     uint   `json:"rd"`
-	Group  string `binding:"required" json:"group"`
-	Roomid string `binding:"required" json:"roomid"`
-	Phrase string `binding:"required" json:"phrase"`
-	Target string `json:"target"`
+	Group  string `json:"group" binding:"required"`
+	Roomid string `json:"roomid" binding:"required"`
+	Phrase string `json:"phrase" binding:"required"`
 	Level  int32  `json:"level"`
+	Target string `json:"target"`
+	Remark string `json:"remark"`
 }
 
 func Create(data *CreateParam) (uint, error) {
@@ -23,8 +24,9 @@ func Create(data *CreateParam) (uint, error) {
 		Group:  data.Group,
 		Roomid: data.Roomid,
 		Phrase: data.Phrase,
-		Target: data.Target,
 		Level:  data.Level,
+		Target: data.Target,
+		Remark: data.Remark,
 	}
 
 	result := dborm.Db.Create(item)
@@ -47,8 +49,9 @@ func Update(data *UpdateParam) error {
 			Group:  data.Group,
 			Roomid: data.Roomid,
 			Phrase: data.Phrase,
-			Target: data.Target,
 			Level:  data.Level,
+			Target: data.Target,
+			Remark: data.Remark,
 		})
 
 	return result.Error
@@ -61,13 +64,14 @@ type ReplaceParam = CreateParam
 
 func Replace(data *ReplaceParam) error {
 
-	item, err := Fetch(&FetchParam{
-		Rd:     data.Rd,
-		Group:  data.Group,
-		Roomid: data.Roomid,
-		Phrase: data.Phrase,
-	})
+	rq := &FetchParam{Rd: data.Rd}
+	if rq.Rd == 0 {
+		rq.Group = data.Group
+		rq.Roomid = data.Roomid
+		rq.Phrase = data.Phrase
+	}
 
+	item, err := Fetch(rq)
 	if err == nil && item.Rd > 0 {
 		data.Rd = item.Rd
 		err = Update(data)

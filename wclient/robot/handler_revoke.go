@@ -1,7 +1,7 @@
 package robot
 
 import (
-	"github.com/opentdp/wechat-rest/wcferry"
+	"github.com/opentdp/wrest-chat/wcferry"
 )
 
 func revokeHandler() []*Handler {
@@ -11,10 +11,9 @@ func revokeHandler() []*Handler {
 	cmds = append(cmds, &Handler{
 		Level:    7,
 		Order:    390,
-		ChatAble: true,
-		RoomAble: true,
+		Roomid:   "*",
 		Command:  "/revoke",
-		Describe: "撤回引用的消息（机器人发送的）",
+		Describe: "撤回引用的机器人发言",
 		Callback: func(msg *wcferry.WxMsg) string {
 			if msg.Sign == "refer-msg" {
 				wc.CmdClient.RevokeMsg(msg.Id)

@@ -3,14 +3,14 @@ package setting
 import (
 	"github.com/opentdp/go-helper/dborm"
 
-	"github.com/opentdp/wechat-rest/dbase/tables"
+	"github.com/opentdp/wrest-chat/dbase/tables"
 )
 
 // 创建配置
 
 type CreateParam struct {
 	Rd     uint   `json:"rd"`
-	Name   string `binding:"required" json:"name"`
+	Name   string `json:"name" binding:"required"`
 	Type   string `json:"type"`
 	Group  string `json:"group"`
 	Value  string `json:"value"`
@@ -64,11 +64,12 @@ type ReplaceParam = CreateParam
 
 func Replace(data *ReplaceParam) error {
 
-	item, err := Fetch(&FetchParam{
-		Rd:   data.Rd,
-		Name: data.Name,
-	})
+	rq := &FetchParam{Rd: data.Rd}
+	if rq.Rd == 0 {
+		rq.Name = data.Name
+	}
 
+	item, err := Fetch(rq)
 	if err == nil && item.Rd > 0 {
 		data.Rd = item.Rd
 		err = Update(data)

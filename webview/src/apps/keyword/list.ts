@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { KeywordGroups, KeywordLevels } from '../../openapi/const';
+import { UserLevels, SpecialRooms, KeywordGroups, BadwordLevels } from '../../openapi/const';
 import { RobotApi, TablesKeyword, KeywordFetchAllParam } from '../../openapi/wrobot';
 import { WrestApi, WcfrestContactPayload } from '../../openapi/wcfrest';
 
@@ -11,16 +11,18 @@ import { WrestApi, WcfrestContactPayload } from '../../openapi/wcfrest';
 })
 export class KeywordListComponent {
 
+    public userLevels = UserLevels;
+    public specialRooms = SpecialRooms;
     public keywordGroups = KeywordGroups;
-    public keywordLevels = KeywordLevels;
+    public badwordLevels = BadwordLevels;
 
     public wcfChatrooms: Record<string, WcfrestContactPayload> = {};
 
     public keywords: Array<TablesKeyword> = [];
 
     public formdata: KeywordFetchAllParam = {
-        group: 'badword',
-        roomid: '-',
+        group: '',
+        roomid: '',
     };
 
     constructor() {
@@ -29,19 +31,19 @@ export class KeywordListComponent {
     }
 
     public getKeywords() {
-        RobotApi.keywordList(this.formdata).then((data) => {
+        return RobotApi.keywordList(this.formdata).then((data) => {
             this.keywords = data || [];
         });
     }
 
     public deleteKeyword(item: TablesKeyword) {
-        RobotApi.keywordDelete({ rd: item.rd }).then(() => {
+        return RobotApi.keywordDelete({ rd: item.rd }).then(() => {
             this.getKeywords();
         });
     }
 
     public getWcfChatrooms() {
-        WrestApi.chatrooms().then((data) => {
+        return WrestApi.chatrooms().then((data) => {
             data.forEach((item) => this.wcfChatrooms[item.wxid] = item);
         });
     }

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/opentdp/wechat-rest/dbase/llmodel"
-	"github.com/opentdp/wechat-rest/dbase/message"
-	"github.com/opentdp/wechat-rest/dbase/profile"
-	"github.com/opentdp/wechat-rest/wcferry"
-	"github.com/opentdp/wechat-rest/wclient/aichat"
+	"github.com/opentdp/wrest-chat/dbase/llmodel"
+	"github.com/opentdp/wrest-chat/dbase/message"
+	"github.com/opentdp/wrest-chat/dbase/profile"
+	"github.com/opentdp/wrest-chat/wcferry"
+	"github.com/opentdp/wrest-chat/wclient/aichat"
 )
 
 func aiHandler() []*Handler {
@@ -21,34 +21,31 @@ func aiHandler() []*Handler {
 	}
 
 	cmds = append(cmds, &Handler{
-		Level:    0,
+		Level:    -1,
 		Order:    100,
-		ChatAble: true,
-		RoomAble: true,
+		Roomid:   "*",
 		Command:  "/ai",
 		Describe: "提问或交谈",
 		Callback: aiCallback,
 	})
 
 	cmds = append(cmds, &Handler{
-		Level:    0,
+		Level:    -1,
 		Order:    101,
-		ChatAble: true,
-		RoomAble: true,
+		Roomid:   "*",
 		Command:  "/ai:new",
 		Describe: "重置上下文内容",
 		Callback: func(msg *wcferry.WxMsg) string {
-			aichat.ResetHistory(msg.Sender, msg.Roomid)
+			aichat.UserConfig(msg.Sender, msg.Roomid).ResetHistory()
 			return "已重置上下文"
 		},
 	})
 
 	if len(models) > 3 {
 		cmds = append(cmds, &Handler{
-			Level:    0,
+			Level:    -1,
 			Order:    103,
-			ChatAble: true,
-			RoomAble: true,
+			Roomid:   "*",
 			Command:  "/ai:rand",
 			Describe: "随机选择模型",
 			Callback: func(msg *wcferry.WxMsg) string {
@@ -62,7 +59,7 @@ func aiHandler() []*Handler {
 				if len(ks) > 0 {
 					v := models[ks[rand.Intn(len(ks))]]
 					profile.Replace(&profile.ReplaceParam{Wxid: msg.Sender, Roomid: prid(msg), AiModel: v.Mid})
-					return "对话模型切换为 " + v.Family + " [" + v.Model + "]"
+					return "对话模型已切换为 " + v.Family + " [" + v.Model + "]"
 				}
 				return fmt.Sprintf("没有可用的模型（Level ≤ %d）", up.Level)
 			},
@@ -75,13 +72,12 @@ func aiHandler() []*Handler {
 		cmds = append(cmds, &Handler{
 			Level:    v.Level,
 			Order:    110 + int32(k),
-			ChatAble: true,
-			RoomAble: true,
+			Roomid:   "*",
 			Command:  cmdkey,
-			Describe: "换模型：" + v.Family,
+			Describe: v.Family,
 			Callback: func(msg *wcferry.WxMsg) string {
 				profile.Replace(&profile.ReplaceParam{Wxid: msg.Sender, Roomid: prid(msg), AiModel: v.Mid})
-				return "对话模型切换为 " + v.Family + " [" + v.Model + "]"
+				return "对话模型已切换为 " + v.Family + " [" + v.Model + "]"
 			},
 		})
 	}
@@ -107,7 +103,7 @@ func aiCallback(msg *wcferry.WxMsg) string {
 		case 1:
 			if ref.Content != "" {
 				msg.Content += "\n内容如下:\n" + ref.Content
-				return aichat.Text(msg.Sender, msg.Roomid, msg.Content)
+				return aichat.Text(msg.Content, msg.Sender, msg.Roomid)
 			}
 		// 图片
 		case 3:
@@ -117,12 +113,12 @@ func aiCallback(msg *wcferry.WxMsg) string {
 					return "提取消息图片失败"
 				}
 			}
-			return aichat.Image(msg.Sender, msg.Roomid, msg.Content, ref.Remark)
+			return aichat.Vison(msg.Content, ref.Remark, msg.Sender, msg.Roomid)
 		// 混合类消息
 		case 49:
 			if ref.Content != "" {
 				msg.Content += "\nXML数据如下:\n" + ref.Content
-				return aichat.Text(msg.Sender, msg.Roomid, msg.Content)
+				return aichat.Text(msg.Content, msg.Sender, msg.Roomid)
 			}
 		// 默认提示
 		default:
@@ -130,6 +126,6 @@ func aiCallback(msg *wcferry.WxMsg) string {
 		}
 	}
 
-	return aichat.Text(msg.Sender, msg.Roomid, msg.Content)
+	return aichat.Text(msg.Content, msg.Sender, msg.Roomid)
 
 }

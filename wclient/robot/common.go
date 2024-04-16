@@ -5,16 +5,14 @@ import (
 
 	"github.com/opentdp/go-helper/logman"
 
-	"github.com/opentdp/wechat-rest/dbase/setting"
-	"github.com/opentdp/wechat-rest/wcferry"
-	"github.com/opentdp/wechat-rest/wclient"
+	"github.com/opentdp/wrest-chat/dbase/setting"
+	"github.com/opentdp/wrest-chat/wcferry"
+	"github.com/opentdp/wrest-chat/wclient"
 )
 
 var wc *wcferry.Client
 
 func Start() {
-
-	setting.Laod()
 
 	if !setting.BotEnable {
 		logman.Warn("robot disabled")

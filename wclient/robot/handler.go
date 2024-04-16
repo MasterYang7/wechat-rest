@@ -4,10 +4,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/opentdp/wechat-rest/dbase/keyword"
-	"github.com/opentdp/wechat-rest/dbase/profile"
-	"github.com/opentdp/wechat-rest/dbase/setting"
-	"github.com/opentdp/wechat-rest/wcferry"
+	"github.com/opentdp/wrest-chat/dbase/keyword"
+	"github.com/opentdp/wrest-chat/dbase/setting"
+	"github.com/opentdp/wrest-chat/wcferry"
 )
 
 var handlers = []*Handler{}
@@ -19,8 +18,7 @@ type HandlerFunc func(*wcferry.WxMsg) string
 type Handler struct {
 	Level    int32       // 0:不限制 7:群管理 9:创始人
 	Order    int32       // 排序，越小越靠前
-	ChatAble bool        // 是否允许在私聊使用
-	RoomAble bool        // 是否允许在群聊使用
+	Roomid   string      // 使用场景 [*:所有,-:私聊,+:群聊,其他:群聊]
 	Command  string      // 指令
 	Describe string      // 指令的描述信息
 	PreCheck HandlerFunc // 前置检查，可拦截文本聊天内容
@@ -45,11 +43,12 @@ func ResetHandlers() {
 	hlst = append(hlst, badHandler()...)
 	hlst = append(hlst, banHandler()...)
 	hlst = append(hlst, pluginHandler()...)
+	hlst = append(hlst, cmddHandler()...)
 	hlst = append(hlst, helpHandler()...)
 	hlst = append(hlst, revokeHandler()...)
 	hlst = append(hlst, roomHandler()...)
 	hlst = append(hlst, topHandler()...)
-	hlst = append(hlst, wgetHandler()...)
+	hlst = append(hlst, webhookHandler()...)
 
 	// 指令列表排序
 	sort.Slice(hlst, func(i, j int) bool {
@@ -58,7 +57,7 @@ func ResetHandlers() {
 
 	// 获取指令映射
 	for _, v := range hlst {
-		hmap[v.Command] = v
+		hmap[v.Command] = v // 重名会覆盖
 		if v.PreCheck != nil {
 			hpre = append(hpre, v)
 		}
@@ -70,6 +69,9 @@ func ResetHandlers() {
 		for _, v := range kws {
 			if hmap[v.Target] != nil {
 				hmap[v.Phrase+"@"+v.Roomid] = hmap[v.Target]
+				if v.Roomid == "*" {
+					hmap[v.Target].Level = v.Level
+				}
 			}
 		}
 	}
@@ -99,9 +101,16 @@ func ApplyHandlers(msg *wcferry.WxMsg) string {
 	params := strings.SplitN(content, " ", 2)
 	handler := handlerMap[params[0]] // 默认
 	if handler == nil {
-		handler = handlerMap[params[0]+"@"+prid(msg)] // 群聊
-		if handler == nil {
-			handler = handlerMap[params[0]+"@-"] // 全局
+		if msg.IsGroup { // 群聊
+			handler = handlerMap[params[0]+"@"+msg.Roomid]
+			if handler == nil {
+				handler = handlerMap[params[0]+"@+"]
+			}
+		} else { // 私聊
+			handler = handlerMap[params[0]+"@-"]
+		}
+		if handler == nil { // 全局
+			handler = handlerMap[params[0]+"@*"]
 			if handler == nil {
 				if content[0] == '/' {
 					return setting.InvalidHandler
@@ -112,15 +121,7 @@ func ApplyHandlers(msg *wcferry.WxMsg) string {
 	}
 
 	// 验证权限
-	if handler.Level > 0 {
-		up, _ := profile.Fetch(&profile.FetchParam{Wxid: msg.Sender, Roomid: prid(msg)})
-		if up.Level < handler.Level {
-			return setting.InvalidHandler
-		}
-	}
-
-	// 验证场景
-	if (msg.IsGroup && !handler.RoomAble) || (!msg.IsGroup && !handler.ChatAble) {
+	if groupLimit(msg, handler.Level, handler.Roomid) {
 		return setting.InvalidHandler
 	}
 

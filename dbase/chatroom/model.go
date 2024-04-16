@@ -3,14 +3,14 @@ package chatroom
 import (
 	"github.com/opentdp/go-helper/dborm"
 
-	"github.com/opentdp/wechat-rest/dbase/tables"
+	"github.com/opentdp/wrest-chat/dbase/tables"
 )
 
 // 创建群聊
 
 type CreateParam struct {
 	Rd           uint   `json:"rd"`
-	Roomid       string `binding:"required" json:"roomid"`
+	Roomid       string `json:"roomid" binding:"required"`
 	Name         string `json:"name"`
 	Level        int32  `json:"level"`
 	Remark       string `json:"remark"`
@@ -79,11 +79,12 @@ type ReplaceParam = CreateParam
 
 func Replace(data *ReplaceParam) error {
 
-	item, err := Fetch(&FetchParam{
-		Rd:     data.Rd,
-		Roomid: data.Roomid,
-	})
+	rq := &FetchParam{Rd: data.Rd}
+	if rq.Rd == 0 {
+		rq.Roomid = data.Roomid
+	}
 
+	item, err := Fetch(rq)
 	if err == nil && item.Rd > 0 {
 		data.Rd = item.Rd
 		err = Update(data)
