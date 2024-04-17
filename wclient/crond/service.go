@@ -55,7 +55,12 @@ func Execute(id uint) error {
 
 	// 发送文本内容
 	if job.Type == "TEXT" {
-		return deliver.Send(job.Deliver, job.Content)
+		if strings.Contains(job.Content, "CHECK_OUT") {
+			return deliver.CheckOut(job.Deliver, job.Content)
+		} else {
+			return deliver.Send(job.Deliver, job.Content)
+		}
+
 	}
 
 	// 发送AI生成的文本

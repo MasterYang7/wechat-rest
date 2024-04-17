@@ -3,8 +3,8 @@ package robot
 import (
 	"strings"
 
-	"github.com/opentdp/wechat-rest/wcferry"
-	"github.com/opentdp/wechat-rest/wclient/util"
+	"github.com/opentdp/wrest-chat/wcferry"
+	"github.com/opentdp/wrest-chat/wclient/util"
 )
 
 func pluginHandler() []*Handler {
@@ -23,7 +23,7 @@ func pluginHandler() []*Handler {
 			}
 			pubgsvc := util.PUBG{}
 			id := strings.Split(msg.Content, "|")
-			season := "28"
+			season := "29"
 			if len(id) == 2 {
 				season = id[1]
 			}

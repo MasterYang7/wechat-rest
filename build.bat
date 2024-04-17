@@ -8,6 +8,7 @@ SET GOOS=windows
 SET GOARCH=amd64
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+COPY webview\public\browser public\
 
 echo building for %GOOS%/%GOARCH%
 
@@ -18,5 +19,6 @@ go build -ldflags="-s -w" -o %target% main.go
 
 COPY README.md build\
 COPY config.yml build\
+
 
 IF "%1" == "" CMD /K
