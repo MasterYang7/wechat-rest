@@ -43,7 +43,6 @@ func CheckOut(deliver, content string) error {
 	delivers := strings.Split(deliver, "\n")
 	client := wclient.Register()
 	for _, dr := range delivers {
-		logman.Warn("deliver "+dr, "content", model)
 		// 解析参数
 		args := strings.Split(strings.TrimSpace(dr), ",")
 		if len(args) < 2 {
@@ -60,7 +59,9 @@ func CheckOut(deliver, content string) error {
 			for _, val := range data {
 				memberMap[val.Wxid] = val.Name
 			}
-			fmt.Println(memberMap)
+			if len(memberMap) == 0 {
+				return nil
+			}
 			if old, ok := RoomMemberMap.Get(roomid); ok {
 				tmp := old
 				if len(memberMap) < len(old) {
