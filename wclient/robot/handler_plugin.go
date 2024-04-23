@@ -29,6 +29,28 @@ func pluginHandler() []*Handler {
 			}
 			return pubgsvc.GetPlayerRank(id[0], season)
 		},
+	}, &Handler{
+		Level:    0,
+		Order:    12,
+		Roomid:   "+",
+		Command:  "抽签",
+		Describe: "抽取",
+		Callback: func(msg *wcferry.WxMsg) string {
+
+			cqsvc := util.CQ{}
+
+			return cqsvc.Chouqian(msg.Sender)
+		},
+	}, &Handler{
+		Level:    0,
+		Order:    12,
+		Roomid:   "+",
+		Command:  "解签",
+		Describe: "解签",
+		Callback: func(msg *wcferry.WxMsg) string {
+			cqsvc := util.CQ{}
+			return cqsvc.Jieqian(msg.Sender)
+		},
 	})
 
 	return cmds
