@@ -111,6 +111,12 @@ export const KeywordGroups: Record<string, OptionData> = {
     imagefn: {
         name: '图片处理',
     },
+    keyword: {
+        name: '关键词回复|模糊',
+    },
+    keywordprecise: {
+        name: '关键词回复|精确',
+    },
 };
 
 export const BadwordLevels: Record<number, OptionData> = {

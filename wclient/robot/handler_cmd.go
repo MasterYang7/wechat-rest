@@ -30,6 +30,7 @@ func cmddHandler() []*Handler {
 			Command:  v.Phrase,
 			Describe: v.Remark,
 			Callback: func(msg *wcferry.WxMsg) string {
+
 				exec := v.Target + " " + msg.Content
 				output, err := command.Exec(&command.ExecPayload{
 					Name:          "Handler:" + v.Phrase,
