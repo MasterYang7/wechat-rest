@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/opentdp/go-helper/logman"
 )
 
 var (
@@ -13,20 +15,6 @@ var (
 )
 
 type PUBG struct{}
-
-var index = -1
-
-func getKey() int {
-	lock.Lock()
-	defer lock.Unlock()
-
-	if index >= len(APP_KEY)-1 {
-		index = 0
-		return 0
-	}
-	index++
-	return index
-}
 
 const model = `ID:%s  赛季:第%s赛季
 TPP.KD:%.2f  段位:%s  场伤:%.2f 场次:%d
@@ -54,10 +42,11 @@ func (p *PUBG) GetPlayerRank(name, seasonId string) string {
 	// https://api.pubg.com/shards/steam/players/account.7d61a1cda14c45da8beacc63804833d3/seasons/division.bro.official.pc-2018-27/ranked
 	rankData := RankedPlayerStats{}
 
-	key := APP_KEY[getKey()]
+	key := APP_KEY.GetNext()
 	url := fmt.Sprintf("https://api.pubg.com/shards/steam/players/%s/seasons/%s/ranked", accountID, seasonStr)
 	reslt, err := ProxySendPubg("GET", url, "", key, nil)
 	if err != nil {
+		logman.Warn("UserInfo ", err.Error())
 		return ""
 	}
 	tppData := FmRankData{}
@@ -115,6 +104,10 @@ func (p *PUBG) GetPlayerRank(name, seasonId string) string {
 		calculatePlayerLevel(fppData.Kd, fppData.CurrentRankPoint, fppData.DamageDealt),
 		userInfo.BanType,
 	)
+	if name == "BHGS_Naruto" {
+		result += `
+		他是FM明星选手喔~1元一张签名照`
+	}
 	return result
 }
 
@@ -123,9 +116,10 @@ func (p *PUBG) UserInfo(userName string) (PubgPlayOut, error) {
 	url := "https://api.pubg.com/shards/steam/players"
 	userName = strings.TrimSpace(userName)
 	url = fmt.Sprintf(url+"?filter[playerNames]=%s", strings.ReplaceAll(userName, " ", ""))
-	key := APP_KEY[getKey()]
+	key := APP_KEY.GetNext()
 	reslt, err := ProxySendPubg("GET", url, "", key, nil)
 	if err != nil {
+		logman.Warn("UserInfo ", err.Error())
 		return res, fmt.Errorf("操作频繁，请稍后再试")
 	}
 	if strings.Contains(string(reslt), "Not Found") {

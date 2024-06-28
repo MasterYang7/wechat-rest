@@ -23,7 +23,7 @@ func pluginHandler() []*Handler {
 			}
 			pubgsvc := util.PUBG{}
 			id := strings.Split(msg.Content, "|")
-			season := "29"
+			season := "30"
 			if len(id) == 2 {
 				season = id[1]
 			}

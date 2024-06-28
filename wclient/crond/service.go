@@ -13,6 +13,7 @@ import (
 	"github.com/opentdp/wrest-chat/wclient"
 	"github.com/opentdp/wrest-chat/wclient/aichat"
 	"github.com/opentdp/wrest-chat/wclient/deliver"
+	"github.com/opentdp/wrest-chat/wclient/util"
 )
 
 var crontab *cron.Cron
@@ -57,6 +58,9 @@ func Execute(id uint) error {
 	if job.Type == "TEXT" {
 		if strings.Contains(job.Content, "CHECK_OUT") {
 			return deliver.CheckOut(job.Deliver, job.Content)
+		} else if strings.Contains(job.Content, "CLEAR_CHOUQIAN") {
+			cqsvc := util.CQ{}
+			cqsvc.Clear()
 		} else {
 			return deliver.Send(job.Deliver, job.Content)
 		}

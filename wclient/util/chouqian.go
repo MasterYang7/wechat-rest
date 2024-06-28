@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -16,8 +17,14 @@ var QianMap = make(map[string]struct {
 	Jie  string
 	Time time.Time
 })
+var TimeMap = make(map[string]int)
+var mu sync.Mutex
 
 type CQ struct {
+}
+
+func (cq CQ) Clear() {
+	TimeMap = make(map[string]int)
 }
 
 func (cq CQ) Chouqian(userId string) string {
@@ -31,7 +38,10 @@ func (cq CQ) Chouqian(userId string) string {
 		Jie   string `json:"jie"`
 		Time  string `json:"time"`
 	}{}
-
+	key := fmt.Sprintf("%s-%s", time.Now().Format("2006-01-02"), userId)
+	if TimeMap[key] >= 5 {
+		return "妲己的签都被您抽完了，请明天再来吧"
+	}
 	reslt, err := ProxySendRes("GET", url, "", heard)
 	if err != nil {
 		return "操作频繁，请稍后再试"
@@ -45,7 +55,10 @@ func (cq CQ) Chouqian(userId string) string {
 		Jie  string
 		Time time.Time
 	}{Qian: resstu.Qian, Jie: resstu.Jie, Time: time.Now()}
+	mu.Lock()
 	QianMap[userId] = qian
+	TimeMap[key]++
+	mu.Unlock()
 	model := `
 您抽到%s
 ----------------
@@ -58,7 +71,9 @@ func (cq CQ) Jieqian(userId string) string {
 ----------------
 🥁%s`
 	if su, ok := QianMap[userId]; ok {
+		mu.Lock()
 		delete(QianMap, userId)
+		mu.Unlock()
 		return fmt.Sprintf(model, su.Jie)
 	} else {
 		return "您未抽签喔（10分钟过期）"
@@ -68,7 +83,9 @@ func (cq CQ) Jieqian(userId string) string {
 func Clear() {
 	for k, v := range QianMap {
 		if v.Time.Add(10 * time.Minute).Before(time.Now()) {
+			mu.Lock()
 			delete(QianMap, k)
+			mu.Unlock()
 		}
 	}
 }

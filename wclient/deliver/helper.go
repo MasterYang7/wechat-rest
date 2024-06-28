@@ -3,6 +3,7 @@ package deliver
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -62,8 +63,12 @@ func CheckOut(deliver, content string) error {
 			if len(memberMap) == 0 {
 				return nil
 			}
+
 			if old, ok := RoomMemberMap.Get(roomid); ok {
 				tmp := old
+				if math.Abs(float64(len(memberMap)-len(old))) > 2 {
+					return nil
+				}
 				if len(memberMap) < len(old) {
 
 					for key, _ := range old {
@@ -73,7 +78,7 @@ func CheckOut(deliver, content string) error {
 					}
 					for wxid, name := range tmp {
 						text := fmt.Sprintf(model, name, name, wxid, time.Now().Format("2006-01-02 15:04:05"))
-						logman.Warn("text "+roomid, "content", text)
+						// logman.Warn("text "+roomid, "content", text)
 						wechatMessage([]string{roomid}, text)
 
 						time.Sleep(1 * time.Second)
