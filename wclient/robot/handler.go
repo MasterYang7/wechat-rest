@@ -125,6 +125,10 @@ func ApplyHandlers(msg *wcferry.WxMsg) string {
 	if groupLimit(msg, handler.Level, handler.Roomid) {
 		return setting.InvalidHandler
 	}
+	// 验证指令禁用
+	if banUser(msg, params[0]) {
+		return "此群聊禁止使用该指令"
+	}
 
 	// 重写消息
 	if len(params) > 1 {

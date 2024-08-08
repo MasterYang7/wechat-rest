@@ -1,6 +1,8 @@
 package robot
 
 import (
+	"strings"
+
 	"github.com/opentdp/wrest-chat/dbase/chatroom"
 	"github.com/opentdp/wrest-chat/dbase/profile"
 	"github.com/opentdp/wrest-chat/dbase/setting"
@@ -107,4 +109,16 @@ func groupLimit(msg *wcferry.WxMsg, level int32, roomid string) bool {
 
 	return false
 
+}
+
+// 群禁用指令检测
+// return 验证结果 [true 受限, false 忽略]
+func banUser(msg *wcferry.WxMsg, key string) bool {
+	if msg.IsGroup {
+		room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+		if room.BanUse != "" {
+			return strings.Contains(room.BanUse, key)
+		}
+	}
+	return false
 }

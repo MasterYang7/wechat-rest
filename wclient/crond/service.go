@@ -61,6 +61,9 @@ func Execute(id uint) error {
 		} else if strings.Contains(job.Content, "CLEAR_CHOUQIAN") {
 			cqsvc := util.CQ{}
 			cqsvc.Clear()
+		} else if strings.Contains(job.Content, "CLEAR_ASTRO") {
+			cqsvc := util.Plugin{}
+			cqsvc.Clear()
 		} else {
 			return deliver.Send(job.Deliver, job.Content)
 		}

@@ -19,3 +19,8 @@ func TestGetkey2(t *testing.T) {
 		fmt.Printf("输出:%d", TimeMap["num"])
 	}
 }
+func TestAres(t *testing.T) {
+	a := Plugin{}
+	str := a.CheckAstro("sss", "白羊")
+	fmt.Printf(str)
+}

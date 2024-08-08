@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/opentdp/wrest-chat/dbase/setting"
 )
 
 var QianMap = make(map[string]struct {
@@ -39,7 +41,7 @@ func (cq CQ) Chouqian(userId string) string {
 		Time  string `json:"time"`
 	}{}
 	key := fmt.Sprintf("%s-%s", time.Now().Format("2006-01-02"), userId)
-	if TimeMap[key] >= 5 {
+	if TimeMap[key] >= setting.CQ {
 		return "妲己的签都被您抽完了，请明天再来吧"
 	}
 	reslt, err := ProxySendRes("GET", url, "", heard)

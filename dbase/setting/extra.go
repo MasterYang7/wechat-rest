@@ -33,6 +33,9 @@ var (
 	ApiEndpointIcon = "https://wrest.rehi.org/assets/icon.png"
 	// HELP 指令扩展内容
 	HelpAdditive = ""
+	Pubg         = "31"
+	Astro        = 1
+	CQ           = 5
 )
 
 // 从数据库加载配置
@@ -74,6 +77,12 @@ func Laod() {
 			ApiEndpointIcon = item.Value
 		case "HelpAdditive":
 			HelpAdditive = item.Value
+		case "Pubg":
+			Pubg = item.Value
+		case "Astro":
+			Astro, _ = strconv.Atoi(item.Value)
+		case "CQ":
+			CQ, _ = strconv.Atoi(item.Value)
 		}
 	}
 

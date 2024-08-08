@@ -17,4 +17,5 @@ type Chatroom struct {
 	ModelHistory int    `json:"model_history"`             // 定义历史消息数量
 	CreatedAt    int64  `json:"created_at"`                // 创建时间戳
 	UpdatedAt    int64  `json:"updated_at"`                // 最后更新时间戳
+	BanUse       string `json:"ban_use"`                   //禁用指令
 }

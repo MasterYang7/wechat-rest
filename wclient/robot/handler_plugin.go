@@ -3,6 +3,7 @@ package robot
 import (
 	"strings"
 
+	"github.com/opentdp/wrest-chat/dbase/setting"
 	"github.com/opentdp/wrest-chat/wcferry"
 	"github.com/opentdp/wrest-chat/wclient/util"
 )
@@ -23,7 +24,7 @@ func pluginHandler() []*Handler {
 			}
 			pubgsvc := util.PUBG{}
 			id := strings.Split(msg.Content, "|")
-			season := "30"
+			season := setting.Pubg
 			if len(id) == 2 {
 				season = id[1]
 			}
@@ -50,6 +51,19 @@ func pluginHandler() []*Handler {
 		Callback: func(msg *wcferry.WxMsg) string {
 			cqsvc := util.CQ{}
 			return cqsvc.Jieqian(msg.Sender)
+		},
+	}, &Handler{
+		Level:    0,
+		Order:    13,
+		Roomid:   "+",
+		Command:  "星座",
+		Describe: "星座运势",
+		Callback: func(msg *wcferry.WxMsg) string {
+			if msg.Content == "" {
+				return "请在指令后输入查询的星座名称"
+			}
+			cqsvc := util.Plugin{}
+			return cqsvc.CheckAstro(msg.Sender, msg.Content)
 		},
 	})
 

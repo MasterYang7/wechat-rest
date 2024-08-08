@@ -358,6 +358,8 @@ export interface ChatroomCreateParam {
     roomid: string;
     // 欢迎消息
     welcome_msg?: string;
+    // 禁用指令
+    ban_use?: string;
 }
 
 export interface ChatroomDeleteParam {
@@ -404,6 +406,8 @@ export interface ChatroomUpdateParam {
     roomid: string;
     // 欢迎消息
     welcome_msg: string;
+        // 禁用指令
+        ban_use?: string;
 }
 
 export interface CronjobCreateParam {
