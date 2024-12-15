@@ -106,7 +106,7 @@ func (p *PUBG) GetPlayerRank(name, seasonId string) string {
 	)
 	if name == "BHGS_Naruto" {
 		result += `
-		他是FM明星选手喔~1元一张签名照`
+		FM明星选手哪里痛 人们都叫他鸡哥 爱好是卸车胎和捡空投`
 	}
 	return result
 }

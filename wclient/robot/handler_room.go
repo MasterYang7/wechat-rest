@@ -1,6 +1,10 @@
 package robot
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/opentdp/wrest-chat/dbase/baninfo"
 	"github.com/opentdp/wrest-chat/dbase/chatroom"
 	"github.com/opentdp/wrest-chat/wcferry"
 )
@@ -25,6 +29,17 @@ func roomHandler() []*Handler {
 				Command:  cmdkey,
 				Describe: v.Name,
 				Callback: func(msg *wcferry.WxMsg) string {
+
+					baninfo, _ := baninfo.FetchOne(&baninfo.FetchParam{Roomid: v.Roomid, Sender: msg.Sender})
+
+					room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+					if baninfo.Ban == 1 {
+						return "黑名单用户，无法使用此功能"
+					}
+					if baninfo.Num > uint(room.BanNum) && baninfo.UpdatedAt+24*3600 > time.Now().Unix() {
+						return fmt.Sprintf("违规用户，%d分钟内无法进该群", (baninfo.UpdatedAt+24*3600-time.Now().Unix())/60)
+					}
+
 					resp := wc.CmdClient.InviteChatroomMembers(v.Roomid, msg.Sender)
 					if resp == 1 {
 						return "已发送群邀请，稍后请点击进入"

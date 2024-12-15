@@ -18,4 +18,6 @@ type Chatroom struct {
 	CreatedAt    int64  `json:"created_at"`                // 创建时间戳
 	UpdatedAt    int64  `json:"updated_at"`                // 最后更新时间戳
 	BanUse       string `json:"ban_use"`                   //禁用指令
+	BanNum       int64  `json:"ban_num"`                   //踢出次数
+	PicoutNum    int64  `json:"picout_num"`                //刷屏次数
 }

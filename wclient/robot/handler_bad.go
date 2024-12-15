@@ -5,13 +5,17 @@ import (
 	"regexp"
 
 	"github.com/importcjj/sensitive"
+	cmap "github.com/orcaman/concurrent-map/v2"
 
+	"github.com/opentdp/wrest-chat/dbase/baninfo"
+	"github.com/opentdp/wrest-chat/dbase/chatroom"
 	"github.com/opentdp/wrest-chat/dbase/keyword"
 	"github.com/opentdp/wrest-chat/dbase/profile"
+	"github.com/opentdp/wrest-chat/dbase/tables"
 	"github.com/opentdp/wrest-chat/wcferry"
 )
 
-var badMember = map[string]int{}
+// var badMember = map[string]int{}
 var badFilter *sensitive.Filter
 
 var roomMemberAlias = map[string]string{}
@@ -95,18 +99,44 @@ func badPreCheck(msg *wcferry.WxMsg) string {
 
 	// 等级违规积分
 	if level > 0 {
-		badMember[msg.Sender] += level
-		if badMember[msg.Sender] > 10 {
-			defer delete(badMember, msg.Sender)
+		room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+		info := updateBan(msg, uint(level))
+		if info.Num > uint(room.BanNum) {
+			// defer delete(badMember, msg.Sender)
 			defer wc.CmdClient.DelChatRoomMembers(msg.Roomid, msg.Sender)
 			str := "违规累计 %d；送你离开，天涯之外你是否还在"
-			return fmt.Sprintf(str, badMember[msg.Sender])
+			return fmt.Sprintf(str, info.Num)
 		}
-		str := "违规风险 +%d，当前累计：%d，大于 10 将被请出群聊"
-		return fmt.Sprintf(str, level, badMember[msg.Sender])
+		str := "违规风险 +%d，当前累计：%d，大于 %d 将被请出群聊"
+		return fmt.Sprintf(str, level, info.Num, room.BanNum)
 	}
 
 	return ""
+
+}
+
+func updateBan(msg *wcferry.WxMsg, level uint) tables.BanInfo {
+	info, ok := BaninfoMap.Get(msg.Roomid)
+	if !ok {
+		info = cmap.New[*tables.BanInfo]()
+	}
+	sender, oks := info.Get(msg.Sender)
+	if !oks {
+		sender = &tables.BanInfo{
+			Roomid: msg.Roomid,
+			Name:   msg.Roomid,
+			Num:    level,
+			Sender: msg.Sender,
+			Ban:    2,
+		}
+		baninfo.Create(&baninfo.CreateParam{Roomid: msg.Roomid, Sender: msg.Sender, Num: sender.Num, Ban: sender.Ban})
+	} else {
+		sender.Num += level
+		baninfo.Update(&baninfo.CreateParam{Roomid: msg.Roomid, Sender: msg.Sender, Num: sender.Num, Ban: sender.Ban})
+	}
+	info.Set(msg.Sender, sender)
+	BaninfoMap.Set(msg.Roomid, info)
+	return *sender
 
 }
 

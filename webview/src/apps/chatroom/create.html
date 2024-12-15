@@ -84,7 +84,8 @@
         </div>
         <div class="col-12">
             <label class="form-label">欢迎信息</label>
-            <input type="text" name="welcome_msg" class="form-control" [(ngModel)]="formdata.welcome_msg" />
+            <!-- <input type="text" name="welcome_msg" class="form-control" [(ngModel)]="formdata.welcome_msg" /> -->
+            <textarea name="welcome_msg" class="form-control" [(ngModel)]="formdata.welcome_msg"></textarea>
             <div class="form-text">
                 用户入群时的欢迎信息，最少2位字符，“-” 表示不启用
             </div>
@@ -105,7 +106,7 @@
         </div>
         <div class="col-12">
             <label class="form-label">禁用指令</label>
-            <input type="text" name="remark" class="form-control" [(ngModel)]="formdata.ban_use" />
+            <input type="text" name="ban_use" class="form-control" [(ngModel)]="formdata.ban_use" />
             <div class="form-text">
                 禁用指令
             </div>

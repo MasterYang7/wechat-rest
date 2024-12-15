@@ -21,7 +21,9 @@ type CreateParam struct {
 	ModelContext string `json:"model_context"`
 	ModelDefault string `json:"model_default"`
 	ModelHistory int    `json:"model_history"`
-	BanUse       string `json:"ban_use"` //禁用指令
+	BanUse       string `json:"ban_use"`    //禁用指令
+	BanNum       int64  `json:"ban_num"`    //踢出次数
+	PicoutNum    int64  `json:"picout_num"` //刷屏次数
 }
 
 func Create(data *CreateParam) (uint, error) {
@@ -39,6 +41,8 @@ func Create(data *CreateParam) (uint, error) {
 		ModelDefault: data.ModelDefault,
 		ModelHistory: data.ModelHistory,
 		BanUse:       data.BanUse,
+		BanNum:       data.BanNum,
+		PicoutNum:    data.PicoutNum,
 	}
 
 	result := dborm.Db.Create(item)
@@ -70,6 +74,8 @@ func Update(data *UpdateParam) error {
 			ModelDefault: data.ModelDefault,
 			ModelHistory: data.ModelHistory,
 			BanUse:       data.BanUse,
+			BanNum:       data.BanNum,
+			PicoutNum:    data.PicoutNum,
 		})
 
 	return result.Error

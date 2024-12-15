@@ -27,6 +27,7 @@ func Connect() {
 	// 实施自动迁移
 	db.AutoMigrate(
 		&tables.Chatroom{},
+		&tables.BanInfo{},
 		&tables.Cronjob{},
 		&tables.Contact{},
 		&tables.Keyword{},

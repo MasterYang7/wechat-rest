@@ -5,12 +5,16 @@ import (
 
 	"github.com/opentdp/go-helper/logman"
 
+	"github.com/opentdp/wrest-chat/dbase/baninfo"
 	"github.com/opentdp/wrest-chat/dbase/setting"
+	"github.com/opentdp/wrest-chat/dbase/tables"
 	"github.com/opentdp/wrest-chat/wcferry"
 	"github.com/opentdp/wrest-chat/wclient"
+	cmap "github.com/orcaman/concurrent-map/v2"
 )
 
 var wc *wcferry.Client
+var BaninfoMap cmap.ConcurrentMap[string, cmap.ConcurrentMap[string, *tables.BanInfo]]
 
 func Start() {
 
@@ -29,6 +33,7 @@ func Start() {
 	if err != nil {
 		logman.Fatal("robot start failed", "error", err)
 	}
+	initBan()
 
 	ResetHandlers()
 
@@ -76,4 +81,22 @@ func reply(msg *wcferry.WxMsg, text string) int32 {
 
 	return wc.CmdClient.SendTxt(text, msg.Sender, "")
 
+}
+
+// 获取违禁名单
+func initBan() {
+	BaninfoMap = cmap.New[cmap.ConcurrentMap[string, *tables.BanInfo]]()
+	banlist, err := baninfo.FetchAll(nil)
+	if err != nil {
+		logman.Fatal("baninfo start failed", "error", err)
+	}
+
+	for _, v := range banlist {
+		info, ok := BaninfoMap.Get(v.Roomid)
+		if !ok {
+			info = cmap.New[*tables.BanInfo]()
+		}
+		info.Set(v.Sender, v)
+		BaninfoMap.Set(v.Roomid, info)
+	}
 }
