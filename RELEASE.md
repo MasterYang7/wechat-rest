@@ -1,5 +1,11 @@
-- feat: 判断违规词时先清洗特殊符号
-- feat: 群聊统计增加聊天总数
-- fix: RoomData panic
-- fix: 防止发送空消息
-- fix: 获取用户名panic
+- feat(webview): add target_name, target_type on webhook list (#44)
+- feat: 分离私聊和群聊白名单
+- fix: 根据生效范围整配置项顺序
+- fix: 更改输入框默认行数
+- fix: 修复cronjob路由错误
+- fix: 修复模型配置页面错误
+- fix: 修复字段描述
+- perf: 优化模型配置选项
+- refactor: cronjob更改到wrobot组
+- style: code lint
+- style: 统一调整按钮边距

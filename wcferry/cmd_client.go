@@ -149,6 +149,31 @@ func (c *CmdClient) GetChatRoomMembers(roomid string) []*RpcContact {
 	return members
 }
 
+// 获取群成员列表
+// param roomid string 群的 id
+// return []*RpcContact 群成员列表
+func (c *CmdClient) GetChatRoomMemberList(roomid string) []*RoomData_RoomMember {
+	members := []*RoomData_RoomMember{}
+	// get room data
+	roomList := c.DbSqlQuery("MicroMsg.db", "SELECT RoomData FROM ChatRoom WHERE ChatRoomName = '"+roomid+"';")
+	if len(roomList) == 0 || len(roomList[0]) == 0 || roomList[0]["RoomData"] == nil {
+		return members
+	}
+	roomData := &RoomData{}
+	if err := proto.Unmarshal(roomList[0]["RoomData"].([]byte), roomData); err != nil {
+		return members
+	}
+	// get user data
+	userList := c.DbSqlQuery("MicroMsg.db", "SELECT UserName, NickName FROM Contact;")
+	userMap := map[string]string{}
+	for _, user := range userList {
+		wxid := user["UserName"].(string)
+		userMap[wxid] = user["NickName"].(string)
+	}
+
+	return roomData.Members
+}
+
 // 获取群成员昵称
 // param wxid string wxid
 // param roomid string 群的 id

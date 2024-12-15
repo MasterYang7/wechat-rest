@@ -392,6 +392,9 @@ export interface ChatroomUpdateParam {
     model_context: string;
     // 历史消息数量
     model_history: number;
+    ban_num?: number;
+
+    picout_num?: number;
     // 群聊名称
     name: string;
     // 回应拍拍我
@@ -407,7 +410,8 @@ export interface ChatroomUpdateParam {
     // 欢迎消息
     welcome_msg: string;
         // 禁用指令
-        ban_use?: string;
+    ban_use?: string;
+    
 }
 
 export interface CronjobCreateParam {

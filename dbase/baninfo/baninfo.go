@@ -1,8 +1,11 @@
 package baninfo
 
 import (
+	"time"
+
 	"github.com/opentdp/go-helper/dborm"
 
+	"github.com/opentdp/wrest-chat/dbase/chatroom"
 	"github.com/opentdp/wrest-chat/dbase/tables"
 )
 
@@ -155,6 +158,25 @@ func FetchAll(data *FetchAllParam) ([]*tables.BanInfo, error) {
 		Find(&items)
 
 	return items, result.Error
+
+}
+func CloseOne() {
+	roomMap := make(map[string]*tables.Chatroom)
+	list, _ := FetchAll(nil)
+	for _, v := range list {
+		if roomMap[v.Roomid] == nil {
+			room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: v.Roomid})
+			if room.BanNum == 0 {
+				room.BanNum = 10
+			}
+			roomMap[v.Roomid] = room
+		}
+		if roomMap[v.Roomid].BanNum < int64(v.Num/2) && v.UpdatedAt+48*3600 > time.Now().Unix() {
+			v.Num--
+			dborm.Db.Where(&tables.BanInfo{Rd: v.Rd}).Updates(v)
+		}
+
+	}
 
 }
 

@@ -38,11 +38,21 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 	r1 := regexp.MustCompile(`邀请"(.+)"加入了群聊`)
 	if matches := r1.FindStringSubmatch(msg.Content); len(matches) > 1 {
 		room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+		time.Sleep(5 * time.Second) // 延迟1秒
+		list := wc.CmdClient.GetChatRoomMembers(msg.Roomid)
+		for _, v := range list {
+			fmt.Println(v.Name, v)
+			if v.Name == matches[1] {
+				msg.Sender = v.Wxid
+				break
+			}
+		}
+		fmt.Println("发送人", msg.Sender, "内容", msg.Content, msg.Roomid)
 		isban, remsg := checkUserIsBan(msg.Roomid, msg.Sender, uint(room.BanNum))
 		if isban {
 
 			defer wc.CmdClient.DelChatRoomMembers(msg.Roomid, msg.Sender)
-			reply(msg, "@"+matches[1]+"\n"+remsg)
+			reply(msg, remsg)
 			return
 		}
 
@@ -57,6 +67,13 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 	r2 := regexp.MustCompile(`"(.+)"通过扫描"(.+)"分享的二维码加入群聊`)
 	if matches := r2.FindStringSubmatch(msg.Content); len(matches) > 1 {
 		room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+		list := wc.CmdClient.GetChatRoomMembers(msg.Roomid)
+		for _, v := range list {
+			if v.Name == matches[1] {
+				msg.Sender = v.Wxid
+				break
+			}
+		}
 		isban, remsg := checkUserIsBan(msg.Roomid, msg.Sender, uint(room.BanNum))
 		if isban {
 
@@ -85,10 +102,14 @@ func receiver10000Private(msg *wcferry.WxMsg) {
 
 }
 func checkUserIsBan(Roomid, Sender string, bannum uint) (bool, string) {
+	if bannum == 0 {
+		bannum = 10
+	}
 	baninfo, err := baninfo.FetchOne(&baninfo.FetchParam{Roomid: Roomid, Sender: Sender})
 	if err != nil {
 		return false, "系统数据库异常，请联系管理员：MasterYang77"
 	}
+	fmt.Println("违规测试", baninfo, baninfo.UpdatedAt+24*3600, time.Now().Unix())
 	if baninfo.Num > bannum && baninfo.UpdatedAt+24*3600 > time.Now().Unix() {
 		return true, fmt.Sprintf("违规用户，%d分钟内无法进该群", (baninfo.UpdatedAt+24*3600-time.Now().Unix())/60)
 	}

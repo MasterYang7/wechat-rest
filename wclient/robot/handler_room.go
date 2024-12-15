@@ -32,10 +32,14 @@ func roomHandler() []*Handler {
 
 					baninfo, _ := baninfo.FetchOne(&baninfo.FetchParam{Roomid: v.Roomid, Sender: msg.Sender})
 
-					room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+					room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: v.Roomid})
 					if baninfo.Ban == 1 {
 						return "黑名单用户，无法使用此功能"
 					}
+					if room.BanNum == 0 {
+						room.BanNum = 10
+					}
+					fmt.Println("违规测试", baninfo, baninfo.UpdatedAt+24*3600, time.Now().Unix())
 					if baninfo.Num > uint(room.BanNum) && baninfo.UpdatedAt+24*3600 > time.Now().Unix() {
 						return fmt.Sprintf("违规用户，%d分钟内无法进该群", (baninfo.UpdatedAt+24*3600-time.Now().Unix())/60)
 					}

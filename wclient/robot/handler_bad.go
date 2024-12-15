@@ -77,29 +77,38 @@ func badPreCheck(msg *wcferry.WxMsg) string {
 	// 管理豁免
 	up, _ := profile.Fetch(&profile.FetchParam{Wxid: msg.Sender, Roomid: prid(msg)})
 	if up.Level > 6 {
+		// fmt.Println("bad:pass "+msg.Content, "管理豁免", msg.Sender)
+		// logger.Info("bad:pass "+msg.Content, "管理豁免", msg.Sender)
 		return ""
 	}
 
 	// 清洗并查找
 	expr := regexp.MustCompile("[[:space:]]|[\x00-\x1F]|[\u2000-\u22ff]")
-	text := roomMemberName(msg.Sender, msg.Roomid) + msg.Content
+	// text := roomMemberName(msg.Sender, msg.Roomid) + msg.Content
+	text := msg.Content
 	keys := badFilter.FindAll(expr.ReplaceAllString(text, ""))
+	// fmt.Println("bad:log "+msg.Content, "发送人", msg.Sender, keys, text)
 	if len(keys) == 0 {
+		// fmt.Println("bad:not fount "+msg.Content, "发送人", msg.Sender)
 		return ""
 	}
 
 	// 判断违禁级别
 	level := 0
 	for _, k := range keys {
-		v, _ := keyword.Fetch(&keyword.FetchParam{Group: "badword", Phrase: k})
+		v, _ := keyword.Fetch(&keyword.FetchParam{Group: "badword", Phrase: k, Roomid: msg.Roomid})
+		// fmt.Println("bad:log ", "level", v.Roomid, msg.Roomid)
 		if v.Level > 0 && (v.Roomid == msg.Roomid || v.Roomid == "*" || v.Roomid == "+") {
 			level += int(v.Level)
 		}
 	}
-
+	// fmt.Println("bad:log ", "level", level)
 	// 等级违规积分
 	if level > 0 {
 		room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+		if room.BanNum == 0 {
+			room.BanNum = 10
+		}
 		info := updateBan(msg, uint(level))
 		if info.Num > uint(room.BanNum) {
 			// defer delete(badMember, msg.Sender)

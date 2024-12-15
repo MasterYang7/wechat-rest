@@ -107,6 +107,10 @@ func SendFlexMsg(msg, wxid, roomid string) int32 {
 			msg = "@" + u.Name + "\n" + msg
 		}
 	}
+	if strings.Contains(msg, "@所有人") {
+		// msg = strings.ReplaceAll(msg, "@所有人", "")
+		ater = "notify@all"
+	}
 	return wc.CmdClient.SendTxt(msg, receiver, ater)
 
 }

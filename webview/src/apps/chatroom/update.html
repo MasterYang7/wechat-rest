@@ -112,6 +112,20 @@
             </div>
         </div>
         <div class="col-12">
+            <label class="form-label">违规移除次数</label>
+            <input type="number" name="ban_num" class="form-control" [(ngModel)]="formdata.ban_num" />
+            <div class="form-text">
+                违规移除次数
+            </div>
+        </div>
+        <div class="col-12">
+            <label class="form-label">图片刷屏次数</label>
+            <input type="number" name="picout_num" class="form-control" [(ngModel)]="formdata.picout_num" />
+            <div class="form-text">
+                图片刷屏次数
+            </div>
+        </div>
+        <div class="col-12">
             <button type="submit" class="btn btn-primary" [disabled]="myform.invalid">确认</button>
         </div>
     </form>

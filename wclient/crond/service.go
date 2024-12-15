@@ -8,6 +8,7 @@ import (
 	"github.com/opentdp/go-helper/logman"
 	"github.com/robfig/cron/v3"
 
+	"github.com/opentdp/wrest-chat/dbase/baninfo"
 	"github.com/opentdp/wrest-chat/dbase/cronjob"
 	"github.com/opentdp/wrest-chat/dbase/tables"
 	"github.com/opentdp/wrest-chat/wclient"
@@ -52,7 +53,7 @@ func Execute(id uint) error {
 		return errors.New("deliver is empty")
 	}
 
-	logger.Info("cron:run "+job.Name, "entryId", job.EntryId)
+	// logger.Info("cron:run "+job.Name, "entryId", job.EntryId)
 
 	// 发送文本内容
 	if job.Type == "TEXT" {
@@ -64,6 +65,8 @@ func Execute(id uint) error {
 		} else if strings.Contains(job.Content, "CLEAR_ASTRO") {
 			cqsvc := util.Plugin{}
 			cqsvc.Clear()
+		} else if strings.Contains(job.Content, "UPDATE_BAN") {
+			baninfo.CloseOne()
 		} else {
 			return deliver.Send(job.Deliver, job.Content)
 		}
