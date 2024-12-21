@@ -12,8 +12,8 @@ import (
 // 创建黑名单
 
 type CreateParam struct {
-	Rd     uint   `json:"rd"`
-	Roomid string `json:"roomid" binding:"required"`
+	Rd     uint   `json:"rd" binding:"required"`
+	Roomid string `json:"roomid" `
 	Name   string `json:"name"`
 	Num    uint   `json:"num"`    // 警告次数
 	Sender string `json:"sender"` // 对象

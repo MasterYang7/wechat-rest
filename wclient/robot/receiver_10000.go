@@ -38,7 +38,7 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 	r1 := regexp.MustCompile(`邀请"(.+)"加入了群聊`)
 	if matches := r1.FindStringSubmatch(msg.Content); len(matches) > 1 {
 		room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
-		time.Sleep(5 * time.Second) // 延迟1秒
+		time.Sleep(3 * time.Second) // 延迟1秒
 		list := wc.CmdClient.GetChatRoomMembers(msg.Roomid)
 		for _, v := range list {
 			fmt.Println(v.Name, v)
@@ -58,7 +58,7 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 
 		if len(room.WelcomeMsg) > 1 {
 			time.Sleep(1 * time.Second) // 延迟1秒
-			reply(msg, "@"+matches[1]+"\n"+room.WelcomeMsg)
+			reply(msg, room.WelcomeMsg)
 		}
 		return
 	}
@@ -67,6 +67,7 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 	r2 := regexp.MustCompile(`"(.+)"通过扫描"(.+)"分享的二维码加入群聊`)
 	if matches := r2.FindStringSubmatch(msg.Content); len(matches) > 1 {
 		room, _ := chatroom.Fetch(&chatroom.FetchParam{Roomid: msg.Roomid})
+		time.Sleep(3 * time.Second) // 延迟1秒
 		list := wc.CmdClient.GetChatRoomMembers(msg.Roomid)
 		for _, v := range list {
 			if v.Name == matches[1] {
@@ -78,12 +79,12 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 		if isban {
 
 			defer wc.CmdClient.DelChatRoomMembers(msg.Roomid, msg.Sender)
-			reply(msg, "@"+matches[1]+"\n"+remsg)
+			reply(msg, remsg)
 			return
 		}
 		if len(room.WelcomeMsg) > 1 {
 			time.Sleep(1 * time.Second) // 延迟1秒
-			reply(msg, "@"+matches[1]+"\n"+room.WelcomeMsg)
+			reply(msg, room.WelcomeMsg)
 		}
 		return
 	}

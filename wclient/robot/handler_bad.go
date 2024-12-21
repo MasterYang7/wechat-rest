@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	"github.com/importcjj/sensitive"
-	cmap "github.com/orcaman/concurrent-map/v2"
 
 	"github.com/opentdp/wrest-chat/dbase/baninfo"
 	"github.com/opentdp/wrest-chat/dbase/chatroom"
@@ -125,12 +124,16 @@ func badPreCheck(msg *wcferry.WxMsg) string {
 }
 
 func updateBan(msg *wcferry.WxMsg, level uint) tables.BanInfo {
-	info, ok := BaninfoMap.Get(msg.Roomid)
-	if !ok {
-		info = cmap.New[*tables.BanInfo]()
+	// info, ok := BaninfoMap.Get(msg.Roomid)
+	// if !ok {
+	// 	info = cmap.New[*tables.BanInfo]()
+	// }
+	sender, err := baninfo.FetchOne(&baninfo.FetchParam{Roomid: msg.Roomid, Sender: msg.Sender})
+	if err != nil {
+		fmt.Println("获取用户信息失败:", err)
+
 	}
-	sender, oks := info.Get(msg.Sender)
-	if !oks {
+	if sender.Sender == "" {
 		sender = &tables.BanInfo{
 			Roomid: msg.Roomid,
 			Name:   msg.Roomid,
@@ -143,8 +146,8 @@ func updateBan(msg *wcferry.WxMsg, level uint) tables.BanInfo {
 		sender.Num += level
 		baninfo.Update(&baninfo.CreateParam{Roomid: msg.Roomid, Sender: msg.Sender, Num: sender.Num, Ban: sender.Ban})
 	}
-	info.Set(msg.Sender, sender)
-	BaninfoMap.Set(msg.Roomid, info)
+	// info.Set(msg.Sender, sender)
+	// BaninfoMap.Set(msg.Roomid, info)
 	return *sender
 
 }
