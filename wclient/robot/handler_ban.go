@@ -54,6 +54,36 @@ func banHandler() []*Handler {
 		},
 		PreCheck: banPreCheck,
 	})
+	cmds = append(cmds, &Handler{
+		Level:    7,
+		Order:    323,
+		Roomid:   "+",
+		Command:  "移除",
+		Describe: "移除指定的用户",
+		Callback: func(msg *wcferry.WxMsg) string {
+			ret := &types.MsgXmlAtUser{}
+			err := xml.Unmarshal([]byte(msg.Xml), ret)
+			if err == nil && ret.AtUserList != "" {
+
+				// 批量操作拉黑
+				users := strings.Split(ret.AtUserList, ",")
+				for _, v := range users {
+					if v == "" {
+						continue
+					}
+					// 管理豁免
+					up, _ := profile.Fetch(&profile.FetchParam{Wxid: v, Roomid: prid(msg)})
+					if up.Level > 6 {
+						return "禁止操作管理员"
+					}
+					defer wc.CmdClient.DelChatRoomMembers(msg.Roomid, msg.Sender)
+				}
+				return fmt.Sprintf("已移除%d个用户", len(users))
+			}
+			return "参数错误"
+		},
+		PreCheck: banPreCheck,
+	})
 
 	cmds = append(cmds, &Handler{
 		Level:    7,
