@@ -171,7 +171,7 @@ func CloseOne() {
 			}
 			roomMap[v.Roomid] = room
 		}
-		if roomMap[v.Roomid].BanNum < int64(v.Num/2) && v.UpdatedAt+48*3600 > time.Now().Unix() {
+		if int64(v.Num) > roomMap[v.Roomid].BanNum/2 && v.UpdatedAt+48*3600 > time.Now().Unix() {
 			v.Num--
 			dborm.Db.Where(&tables.BanInfo{Rd: v.Rd}).Updates(v)
 		}

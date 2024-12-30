@@ -64,21 +64,23 @@ func banHandler() []*Handler {
 			ret := &types.MsgXmlAtUser{}
 			err := xml.Unmarshal([]byte(msg.Xml), ret)
 			if err == nil && ret.AtUserList != "" {
-
+				num := 0
 				// 批量操作拉黑
 				users := strings.Split(ret.AtUserList, ",")
+				fmt.Println(users, ret.AtUserList)
 				for _, v := range users {
 					if v == "" {
 						continue
 					}
 					// 管理豁免
-					up, _ := profile.Fetch(&profile.FetchParam{Wxid: v, Roomid: prid(msg)})
+					up, _ := profile.Fetch(&profile.FetchParam{Wxid: v, Roomid: msg.Roomid})
 					if up.Level > 6 {
 						return "禁止操作管理员"
 					}
-					defer wc.CmdClient.DelChatRoomMembers(msg.Roomid, msg.Sender)
+					wc.CmdClient.DelChatRoomMembers(msg.Roomid, v)
+					num++
 				}
-				return fmt.Sprintf("已移除%d个用户", len(users))
+				return fmt.Sprintf("已移除%d个用户", num)
 			}
 			return "参数错误"
 		},

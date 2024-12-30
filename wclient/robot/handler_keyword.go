@@ -31,13 +31,17 @@ func keyworddHandler() []*Handler {
 		cmds = append(cmds, &Handler{
 			Level:    v.Level,
 			Order:    410 + int32(k),
-			Roomid:   v.Roomid,
+			Roomid:   "*",
 			Command:  v.Phrase,
 			Describe: v.Remark,
 			PreCheck: func(msg *wcferry.WxMsg) string {
 				arr := strings.Split(v.Phrase, "|")
 				for _, key := range arr {
-					if strings.Contains(msg.Content, key) {
+					if strings.Contains(msg.Content, key) && (v.Roomid == msg.Roomid || v.Roomid == "*" || v.Roomid == "+") {
+						wclient.SendFlexMsg(v.Target, msg.Sender, msg.Roomid)
+						return ""
+					}
+					if strings.Contains(msg.Content, key) && !msg.IsGroup && v.Roomid == "-" {
 						wclient.SendFlexMsg(v.Target, msg.Sender, msg.Roomid)
 						return ""
 					}
@@ -56,13 +60,17 @@ func keyworddHandler() []*Handler {
 		cmds = append(cmds, &Handler{
 			Level:    v.Level,
 			Order:    410 + int32(k),
-			Roomid:   v.Roomid,
+			Roomid:   "*",
 			Command:  v.Phrase,
 			Describe: v.Remark,
 			PreCheck: func(msg *wcferry.WxMsg) string {
 				arr := strings.Split(v.Phrase, "|")
 				for _, key := range arr {
-					if msg.Content == key {
+					if msg.Content == key && (v.Roomid == msg.Roomid || v.Roomid == "*" || v.Roomid == "+") {
+						wclient.SendFlexMsg(v.Target, msg.Sender, msg.Roomid)
+						return ""
+					}
+					if msg.Content == key && !msg.IsGroup && v.Roomid == "-" {
 						wclient.SendFlexMsg(v.Target, msg.Sender, msg.Roomid)
 						return ""
 					}
