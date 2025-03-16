@@ -79,8 +79,8 @@ rm -rf windows/wrest-linux-amd64
 mv windows/wrest-windows-amd64.exe windows/wrest.exe
 
 mkdir -p windows/wcferry
-wget https://github.com/lich0821/WeChatFerry/releases/download/v39.2.4/v39.2.4.zip
-unzip -d windows/wcferry v39.2.4.zip && rm -f v39.2.4.zip
+wget https://github.com/lich0821/WeChatFerry/releases/download/v39.4.2/v39.4.2.zip
+unzip -d windows/wcferry v39.4.2.zip && rm -f v39.4.2.zip
 
 cd windows
 zip -r ../wrest-windows-v$version.zip .

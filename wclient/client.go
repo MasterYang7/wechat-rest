@@ -51,10 +51,10 @@ func Register() *wcferry.Client {
 
 	// 存储收到的消息
 	if args.Wcf.MsgStore {
-		wc.EnrollReceiver(true, msgToDatabase)
-		if (args.Wcf.MsgStoreDays) > 0 {
-			message.Shrink(args.Wcf.MsgStoreDays)
-		}
+		// wc.EnrollReceiver(true, msgToDatabase)
+		// if (args.Wcf.MsgStoreDays) > 0 {
+		// 	message.Shrink(args.Wcf.MsgStoreDays)
+		// }
 	}
 
 	return wc

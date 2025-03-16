@@ -14,10 +14,10 @@ var Efs *embed.FS
 
 // 版本信息
 
-const Version = "0.10.0"
-const BuildVersion = "240106"
+const Version = "39.4.2"
+const BuildVersion = "250316"
 
 // 应用描述
 
-const AppName = "TDP Wrest"
-const AppSummary = "智能聊天助手"
+const AppName = "WeChat"
+const AppSummary = "微信消息管家"

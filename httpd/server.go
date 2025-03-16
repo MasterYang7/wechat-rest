@@ -5,9 +5,7 @@ import (
 
 	"github.com/opentdp/wrest-chat/args"
 	"github.com/opentdp/wrest-chat/httpd/middle"
-	"github.com/opentdp/wrest-chat/httpd/sundry"
 	"github.com/opentdp/wrest-chat/httpd/wcfrest"
-	"github.com/opentdp/wrest-chat/httpd/wrobot"
 )
 
 // @title Wrest Chat Api
@@ -24,13 +22,13 @@ func Server() {
 	httpd.Engine(args.Debug)
 
 	// 其他路由
-	sundry.Route()
+	// sundry.Route()
 
 	// Wcfrest 路由
 	wcfrest.Route()
 
 	// Wrobot 路由
-	wrobot.Route()
+	// wrobot.Route()
 
 	// Swagger 守卫
 	httpd.Use(middle.SwaggerGuard)
