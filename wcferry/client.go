@@ -56,7 +56,7 @@ func (c *Client) Connect() error {
 // return string 接收器唯一标识
 func (c *Client) EnrollReceiver(pyq bool, cb MsgConsumer) (string, error) {
 	if c.MsgClient.consumer == nil {
-		if c.CmdClient.EnableMsgReciver(true) != 0 {
+		if c.CmdClient.EnableMsgReciver(false) != 0 {
 			return "", errors.New("failed to enable msg server")
 		}
 	}
