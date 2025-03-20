@@ -46,6 +46,7 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 				msg.Sender = v.Wxid
 				break
 			}
+
 		}
 		fmt.Println("发送人", msg.Sender, "内容", msg.Content, msg.Roomid)
 		isban, remsg := checkUserIsBan(msg.Roomid, msg.Sender, uint(room.BanNum))
@@ -58,7 +59,17 @@ func receiver10000Public(msg *wcferry.WxMsg) {
 
 		if len(room.WelcomeMsg) > 1 {
 			time.Sleep(1 * time.Second) // 延迟1秒
-			reply(msg, room.WelcomeMsg)
+			if room.Roomid == "47697253318@chatroom" {
+				avatar := wc.CmdClient.GetAvatar([]string{msg.Sender})
+				avatarurl := "https://cache.jg110.cn/fm/1702083164"
+				if len(avatar) > 0 {
+					avatarurl = avatar[0].SmallHeadImgUrl
+				}
+				wc.CmdClient.SendRichText("👆点我查看FM联赛赛事手册", "", fmt.Sprintf("👏欢迎 %s 加入FM选手群🎇", matches[1]), "请第一时间修改群昵称为游戏ID，并阅读赛事手册和群规", "https://weibo.cn/sinaurl?u=https%3A%2F%2Fmp.weixin.qq.com%2Fs%2FurGeywGtGmFYW2lJ0i_52g", avatarurl, msg.Roomid)
+			} else {
+
+				reply(msg, room.WelcomeMsg)
+			}
 		}
 		return
 	}

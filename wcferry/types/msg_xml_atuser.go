@@ -12,3 +12,11 @@ type MsgXmlAtUser struct {
 		PublisherID string `xml:",chardata"`
 	} `xml:"tmp_node"`
 }
+type AvatarPayload struct {
+	// 用户 id
+	UsrName string `json:"usr_name,omitempty"`
+	// 大头像 url
+	BigHeadImgUrl string `json:"big_head_img_url,omitempty"`
+	// 小头像 url
+	SmallHeadImgUrl string `json:"small_head_img_url,omitempty"`
+}

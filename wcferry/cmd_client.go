@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
+	"github.com/opentdp/wrest-chat/wcferry/types"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -668,4 +670,24 @@ func (c *CmdClient) DisableMsgReciver() int32 {
 	req := &Request{Func: Functions_FUNC_DISABLE_RECV_TXT}
 	recv := c.call(req)
 	return recv.GetStatus()
+}
+func (c *CmdClient) GetAvatar(wxid []string) []types.AvatarPayload {
+	sql := "SELECT usrName as UsrName, bigHeadImgUrl as BigHeadImgUrl, smallHeadImgUrl as SmallHeadImgUrl FROM ContactHeadImgUrl"
+
+	if len(wxid) > 0 {
+		for i, v := range wxid {
+			wxid[i] = strings.ReplaceAll(v, "'", "''")
+		}
+		sql += " WHERE usrName IN ('" + strings.Join(wxid, "','") + "')"
+	}
+
+	res := c.DbSqlQuery("MicroMsg.db", sql)
+
+	var result []types.AvatarPayload
+	if mapstructure.Decode(res, &result) == nil {
+		return result
+	} else {
+		return nil
+	}
+
 }
