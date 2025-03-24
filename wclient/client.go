@@ -101,15 +101,16 @@ func SendFlexMsg(msg, wxid, roomid string) int32 {
 		}
 	}
 
-	// 发送文本信息
-	if ater != "" {
-		if u := wc.CmdClient.GetInfoByWxid(ater); u != nil && u.Name != "" {
-			msg = "@" + u.Name + "\n" + msg
-		}
-	}
 	if strings.Contains(msg, "@所有人") {
 		// msg = strings.ReplaceAll(msg, "@所有人", "")
 		ater = "notify@all"
+	} else {
+		// 发送文本信息
+		if ater != "" {
+			if u := wc.CmdClient.GetInfoByWxid(ater); u != nil && u.Name != "" {
+				msg = "@" + u.Name + "\n" + msg
+			}
+		}
 	}
 	return wc.CmdClient.SendTxt(msg, receiver, ater)
 

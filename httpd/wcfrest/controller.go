@@ -374,6 +374,9 @@ func (wc *Controller) sendTxt(c *gin.Context) {
 		c.Set("Error", err)
 		return
 	}
+	if strings.Contains(req.Msg, "@所有人") {
+		req.Aters = append(req.Aters, "notify@all")
+	}
 
 	status := wc.CmdClient.SendTxt(req.Msg, req.Receiver, strings.Join(req.Aters, ","))
 
